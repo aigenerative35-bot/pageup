@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>My library — PageUp</title>
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%234f46e5'/><path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>">
+</head>
+<body>
+  <div id="appHeader"></div>
+
+  <main class="container">
+    <div class="section-head" style="margin-top:30px">
+      <div>
+        <h2>My library</h2>
+        <p>Everything you have liked, unlocked or started reading.</p>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true"  data-panel="continue">Continue reading</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="liked">Liked</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="owned">Unlocked</button>
+    </div>
+
+    <div id="panel-continue"><div class="grid" id="gridContinue"></div></div>
+    <div id="panel-liked" class="hidden"><div class="grid" id="gridLiked"></div></div>
+    <div id="panel-owned" class="hidden"><div class="grid" id="gridOwned"></div></div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:0;margin-top:0">
+        <span>&copy; <span id="year"></span> PageUp.</span>
+        <span class="spacer"></span>
+        <a class="small muted" href="./index.html">Browse catalogue</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./assets/js/library.js"></script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

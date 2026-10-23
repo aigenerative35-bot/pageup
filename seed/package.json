@@ -1,0 +1,14 @@
+{
+  "name": "pageup-seed",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Seed the PageUp Firestore catalogue with sample books.",
+  "type": "module",
+  "scripts": {
+    "seed": "node seed.js",
+    "seed:emulator": "FIRESTORE_EMULATOR_HOST=localhost:8080 node seed.js --emulator"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.5.0"
+  }
+}

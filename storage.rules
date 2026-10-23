@@ -1,0 +1,43 @@
+rules_version = '2';
+
+// PageUp — Cloud Storage security rules
+// Book files and covers are public to read (the reader streams them from the
+// browser) but only staff may upload, replace or delete them.
+//
+// Layout expected in the bucket:
+//   books/{bookId}/original.pdf
+//   books/{bookId}/original.epub
+//   covers/{bookId}.jpg
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isStaff() {
+      return request.auth != null && request.auth.token.staff == true;
+    }
+
+    function isReadableFile() {
+      return request.resource.size < 80 * 1024 * 1024
+        && (request.resource.contentType == 'application/pdf'
+            || request.resource.contentType == 'application/epub+zip'
+            || request.resource.contentType.matches('image/.*'));
+    }
+
+    match /books/{bookId}/{fileName} {
+      allow read: if true;
+      allow write: if isStaff() && isReadableFile();
+      allow delete: if isStaff();
+    }
+
+    match /covers/{fileName} {
+      allow read: if true;
+      allow write: if isStaff() && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if isStaff();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebaserc.local
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Secrets — never commit service accounts or env files
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+.env
+.env.*
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Local
+scratch/
+tmp/

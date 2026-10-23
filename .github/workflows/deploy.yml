@@ -1,0 +1,39 @@
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: firebase-hosting
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Add the project id to .firebaserc (or set it once and commit it).
+      - name: Point Firebase at the project
+        if: ${{ vars.FIREBASE_PROJECT_ID != '' }}
+        run: |
+          node -e "const f='.firebaserc';const j=require('./'+f);j.projects.default=process.env.PID;require('fs').writeFileSync(f,JSON.stringify(j,null,2));"
+        env:
+          PID: ${{ vars.FIREBASE_PROJECT_ID }}
+
+      - name: Deploy hosting + rules
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}

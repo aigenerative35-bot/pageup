@@ -1,0 +1,108 @@
+rules_version = '2';
+
+// PageUp — Firestore security rules
+// ---------------------------------------------------------------------------
+// Principles:
+//   1. Catalogue data is world-readable, staff-writable.
+//   2. A signed-in user may only write rows that belong to their own uid.
+//   3. Clients may only touch the aggregate counter fields on a book
+//      (views, likes, ratingSum, ratingCount, ratingAvg) — never the content.
+//   4. Purchases are written by the client only in demo mode. In production,
+//      move that write into a Cloud Function triggered by the payment
+//      gateway webhook and change the rule below to `allow write: if false;`.
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- helpers ----------------------------------------------------------
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Staff accounts carry a custom claim set with the Admin SDK.
+    function isStaff() {
+      return signedIn() && request.auth.token.staff == true;
+    }
+
+    // Fields a client is allowed to bump on a book document.
+    function counterOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['views', 'likes', 'ratingSum', 'ratingCount', 'ratingAvg']);
+    }
+
+    // ---- books ------------------------------------------------------------
+    match /books/{bookId} {
+      allow read: if true;
+      allow create, delete: if isStaff();
+      allow update: if isStaff() || (signedIn() && counterOnly());
+
+      // ---- likes ----------------------------------------------------------
+      match /likes/{uid} {
+        allow read: if signedIn();
+        allow create, delete: if isSelf(uid);
+        allow update: if false;
+      }
+
+      // ---- ratings --------------------------------------------------------
+      match /ratings/{uid} {
+        allow read: if isSelf(uid) || isStaff();
+        allow create, update: if isSelf(uid)
+          && request.resource.data.value is int
+          && request.resource.data.value >= 1
+          && request.resource.data.value <= 5
+          && request.resource.data.uid == uid;
+        allow delete: if isSelf(uid);
+      }
+
+      // ---- comments -------------------------------------------------------
+      match /comments/{commentId} {
+        allow read: if true;
+
+        allow create: if signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 2000
+          && request.resource.data.likes == 0;
+
+        // Only the like counter may be changed after posting.
+        allow update: if signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']);
+
+        allow delete: if signedIn()
+          && (resource.data.uid == request.auth.uid || isStaff());
+
+        match /likes/{uid} {
+          allow read: if signedIn();
+          allow create, delete: if isSelf(uid);
+          allow update: if false;
+        }
+      }
+    }
+
+    // ---- users ------------------------------------------------------------
+    match /users/{uid} {
+      allow read, update: if isSelf(uid);
+      allow create: if isSelf(uid);
+      allow delete: if isStaff();
+
+      // Private fields must never be self-promoted to premium.
+      // (Kept permissive here so the demo checkout works end to end.)
+      match /purchases/{bookId} {
+        allow read: if isSelf(uid);
+        allow create: if isSelf(uid);
+        allow update, delete: if false;
+      }
+    }
+
+    // Deny everything not matched above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
