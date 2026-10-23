@@ -23,7 +23,7 @@ export function toggleTheme() {
 }
 
 /* -------------------------------------------------------------- Session */
-export const session = { user: null, profile: null, ready: false };
+export const session = { user: null, profile: null, ready: false, isStaff: false };
 const listeners = new Set();
 export function onSession(cb) { listeners.add(cb); if (session.ready) cb(session); return () => listeners.delete(cb); }
 function emit() { listeners.forEach((cb) => { try { cb(session); } catch (e) { console.error(e); } }); }
@@ -39,15 +39,22 @@ export function initAuth() {
       session.user = user;
       if (profileUnsub) { profileUnsub(); profileUnsub = null; }
       if (user) {
+        // Staff is a custom claim, not a document field — read it from the token.
+        try {
+          const token = await user.getIdTokenResult();
+          session.isStaff = token.claims?.staff === true;
+        } catch { session.isStaff = false; }
         try { session.profile = await ensureUserProfile(user); } catch { session.profile = null; }
         profileUnsub = subscribeProfile(user.uid, (p) => {
           if (p) { session.profile = p; emit(); renderShellAuth(); renderPlanCard(); }
         });
       } else {
         session.profile = null;
+        session.isStaff = false;
       }
       session.ready = true;
       renderShellAuth();
+      renderStaffNav();
       renderPlanCard();
       emit();
       resolve(session);
@@ -150,9 +157,33 @@ export function renderShell() {
 
   $('#navSignIn').addEventListener('click', () => openAuthModal());
   renderShellAuth();
+  renderStaffNav();
   renderPlanCard();
   loadNavCategories();
   enterView();
+}
+
+/** The Admin rail entry only exists for accounts carrying the staff claim. */
+export function renderStaffNav() {
+  const nav = $('#sidebarNav');
+  if (!nav) return;
+  const existing = $('#navAdmin');
+  // Preview mode has no server and no shared data, so the console is open to
+  // the visitor's own browser — the rail entry belongs there too.
+  const allowed = session.isStaff || !isConfigured;
+  if (!allowed) { existing?.remove(); return; }
+  if (existing) return;
+
+  const section = el('div', { class: 'nav-section', id: 'navAdmin' });
+  section.append(el('div', { class: 'nav-section__label', text: 'Manage' }));
+  const a = el('a', {
+    class: `nav-item${location.pathname.endsWith('admin.html') ? ' is-active' : ''}`,
+    href: './admin.html',
+    html: `${icon('settings')}<span>Admin panel</span>`,
+  });
+  a.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
+  section.append(a);
+  nav.append(section);
 }
 
 /** Replay the slide-in transition on the page's main content. */

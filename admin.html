@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Admin — PageUp</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#226db4">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%23226db4'/><path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>">
+</head>
+<body>
+  <div id="appHeader"></div>
+
+  <main class="container">
+    <div id="adminView">
+      <div class="page-head"><div><h1>Admin</h1><p>Checking your access…</p></div></div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:0;margin-top:0">
+        <span>&copy; <span id="year"></span> PageUp. Admin console.</span>
+        <span class="spacer"></span>
+        <a class="small muted" href="./index.html">Back to the site</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./assets/js/admin.js"></script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

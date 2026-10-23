@@ -6,7 +6,10 @@ import {
   query, where, orderBy, limit as fbLimit, startAfter, serverTimestamp,
   onSnapshot, increment, writeBatch, runTransaction,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-import { db, COLLECTIONS } from "./firebase.js";
+import {
+  ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject,
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+import { db, storage, COLLECTIONS } from "./firebase.js";
 
 const booksCol = () => collection(db, COLLECTIONS.books);
 const bookDoc  = (id) => doc(db, COLLECTIONS.books, id);
@@ -22,13 +25,17 @@ const bookDoc  = (id) => doc(db, COLLECTIONS.books, id);
 export async function listBooks({
   sort = 'trending', category = 'all', search = '', pageSize = 24, cursor = null,
 } = {}) {
-  const orderField =
-    sort === 'newest'  ? 'createdAt' :
-    sort === 'rating'  ? 'ratingAvg' :
-    sort === 'views'   ? 'views' :
-    sort === 'likes'   ? 'likes' : 'trendScore';
+  const SORTS = {
+    newest:   ['createdAt', 'desc'],
+    rating:   ['ratingAvg', 'desc'],
+    views:    ['views', 'desc'],
+    likes:    ['likes', 'desc'],
+    trending: ['trendScore', 'desc'],
+    title:    ['title', 'asc'],
+  };
+  const [orderField, orderDir] = SORTS[sort] || SORTS.trending;
 
-  const clauses = [orderBy(orderField, 'desc')];
+  const clauses = [orderBy(orderField, orderDir)];
   if (cursor) clauses.push(startAfter(cursor));
   clauses.push(fbLimit(pageSize));
 
@@ -261,4 +268,122 @@ export async function subscribeUnlocked(uid, cb) {
   return onSnapshot(collection(db, COLLECTIONS.users, uid, 'purchases'), (snap) => {
     cb(new Set(snap.docs.map((d) => d.id)));
   }, () => cb(new Set()));
+}
+
+/* ==========================================================================
+   Admin — catalogue writes and asset uploads
+   Every one of these is gated server-side by firestore.rules / storage.rules
+   (isStaff()), so a non-staff client calling them gets a permission error.
+   ========================================================================== */
+
+const FORMATS = ['pdf', 'epub'];
+
+/** Client-side shape check. The rules enforce the same constraints again. */
+export function normalizeBook(input = {}) {
+  const str = (v, max) => String(v ?? '').trim().slice(0, max);
+  const num = (v, fallback = 0) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : fallback;
+  };
+
+  const title = str(input.title, 200);
+  if (!title) throw new Error('Title is required.');
+
+  const format = FORMATS.includes(String(input.format)) ? String(input.format) : 'pdf';
+  const price = num(input.price, 0);
+  const isPremium = !!input.isPremium;
+
+  const book = {
+    title,
+    author: str(input.author, 120) || 'Unknown author',
+    description: str(input.description, 5000),
+    category: str(input.category, 60) || 'General',
+    tags: Array.isArray(input.tags)
+      ? input.tags.map((t) => str(t, 40)).filter(Boolean).slice(0, 12)
+      : str(input.tags, 200).split(',').map((t) => t.trim()).filter(Boolean).slice(0, 12),
+    language: str(input.language, 40) || 'English',
+    format,
+    pages: Math.round(num(input.pages, 0)) || null,
+    publisher: str(input.publisher, 120),
+    publishedYear: str(input.publishedYear, 12),
+    isbn: str(input.isbn, 24),
+    isPremium,
+    price: isPremium ? price : 0,
+    previewPages: Math.round(num(input.previewPages, 12)) || 12,
+    featured: !!input.featured,
+    isNew: !!input.isNew,
+    coverUrl: str(input.coverUrl, 2000),
+    fileUrl: str(input.fileUrl, 2000),
+  };
+
+  // Lower-cased word list, so `array-contains` search works without an index.
+  book.searchTerms = [...new Set(
+    [book.title, book.author, book.category, ...book.tags]
+      .join(' ').toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2),
+  )];
+
+  return book;
+}
+
+/** A new doc ref with a server-assigned id, so assets can be keyed by it. */
+export function newBookRef() {
+  return doc(collection(db, COLLECTIONS.books));
+}
+
+export async function createBook(id, input) {
+  const book = normalizeBook(input);
+  const ref = id ? bookDoc(id) : newBookRef();
+  await setDoc(ref, {
+    ...book,
+    views: 0, likes: 0, commentCount: 0,
+    ratingSum: 0, ratingCount: 0, ratingAvg: 0,
+    trendScore: 0,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateBook(id, input) {
+  const book = normalizeBook(input);
+  await updateDoc(bookDoc(id), { ...book, updatedAt: serverTimestamp() });
+  return id;
+}
+
+export async function removeBook(id) {
+  await deleteDoc(bookDoc(id));
+}
+
+/* ------------------------------------------------------------ uploads */
+
+/**
+ * Uploads a file to Storage with progress reporting.
+ * @param {'cover'|'book'} kind
+ * @param {string} bookId
+ * @param {File} file
+ * @param {(percent:number) => void} onProgress
+ * @returns {Promise<{url: string, path: string}>}
+ */
+export async function uploadAsset(kind, bookId, file, onProgress) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  const path = kind === 'cover'
+    ? `covers/${bookId}.${ext || 'jpg'}`
+    : `books/${bookId}/original.${ext || 'pdf'}`;
+
+  const ref = storageRef(storage, path);
+  const task = uploadBytesResumable(ref, file, { contentType: file.type || undefined });
+
+  await new Promise((resolve, reject) => {
+    task.on('state_changed',
+      (snap) => onProgress?.(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+      reject,
+      resolve);
+  });
+
+  return { url: await getDownloadURL(ref), path };
+}
+
+export async function removeAsset(path) {
+  if (!path) return;
+  try { await deleteObject(storageRef(storage, path)); } catch { /* already gone */ }
 }

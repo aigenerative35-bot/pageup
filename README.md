@@ -20,6 +20,7 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 | Auth: Google + email/password, password reset, persistent session | `assets/js/ui.js` |
 | My Library: continue reading, liked, unlocked | `library.html` |
 | Ad-style launch banner: 7 slides, auto-advance, arrows, dots, swipe, keyboard | `assets/js/banner.js` |
+| Admin console: publish / edit / delete books, upload covers and files, feature in the banner | `admin.html`, `assets/js/admin.js` |
 | Zoho-style design language in blue & white: #226DB4 accent, top bar + left nav rail, flat white panels | `assets/css/styles.css`, `assets/js/ui.js` |
 | Motion: content slides in on every route change, cards rise in staggered | `assets/css/styles.css`, `assets/js/ui.js` |
 | Lazy cover loading via IntersectionObserver, with fade-in | `assets/js/util.js`, `assets/js/cards.js` |
@@ -115,6 +116,90 @@ python3 tools/build-preview.py     # writes preview.html
 
 It is a preview, not the product: there is no auth, nothing is shared between
 devices, and no money moves. Everything below is the real thing.
+
+---
+
+## The admin console
+
+`admin.html` is a separate page that manages **the same catalogue the public
+site reads**. There is no second copy of the data and nothing to keep in sync:
+the console writes to Firestore and Storage, the site reads from Firestore and
+Storage, and a published book is live on the site the moment it saves.
+
+```
+admin.html ──write──▶ Firestore books/{id} ──read──▶ index.html
+           ──upload─▶ Storage  covers/…, books/{id}/…
+```
+
+Open it at `/admin.html` on your site.
+
+### What it does
+
+- **Dashboard** — books, premium, free, featured, reads, likes, comments
+- **Publish** — title, author, category, language, format, pages, publisher,
+  year, ISBN, tags, description, premium + price, free-preview pages, featured,
+  new. A **live card preview** shows exactly how it will look in the grid.
+- **Upload** — cover image and the PDF/EPUB itself, with a progress bar. They
+  land in Storage and the download URL is written back to the document, so you
+  never paste a URL by hand.
+- **Catalogue** — filter by title/author, edit, toggle "featured" (which drives
+  the launch banner), view on the site, delete with a confirmation.
+
+### Access: the `staff` custom claim
+
+The console is not protected by a password in the page — that would be
+security theatre. It is protected by the **security rules**:
+
+```
+allow create, delete: if isStaff() && validBook();
+allow update: if (isStaff() && validBook()) || (signedIn() && counterOnly());
+```
+
+`isStaff()` reads a Firebase Auth **custom claim**, which only the Admin SDK
+can set. So even if someone loads `admin.html` and pokes at the network tab,
+every write is rejected.
+
+Grant it once:
+
+```bash
+cd seed && npm install
+GOOGLE_APPLICATION_CREDENTIALS=./serviceAccount.json \
+  node grant-staff.js you@example.com
+
+node grant-staff.js --list          # who has it
+node grant-staff.js you@example.com --revoke
+```
+
+The account must sign out and back in for the claim to take effect. The
+**Admin panel** entry appears in the left rail only for accounts that have it.
+
+### In preview mode
+
+With no Firebase config the console is **open and fully usable**, and a banner
+says so. Everything it writes stays in your own browser — there is no server
+and no shared data, so nothing leaks. Connect a Firebase project and the same
+screens become the real thing behind the staff gate.
+
+---
+
+## Why not a Node/Express + JSON file backend?
+
+It is a perfectly good pattern, and it is the right choice if you want to own
+the server. It is the wrong choice *for this app*, for three concrete reasons:
+
+1. **It would break the live site.** GitHub Pages, Netlify and Vercel serve
+   static files only — a Node process cannot run there. You would lose the
+   `github.io` URL and need Render/Railway/Fly.io or a VPS instead.
+2. **The "localStorage jugaad" problem is already solved.** The site does not
+   use localStorage for real data — it uses Firestore. localStorage is only the
+   offline demo fallback used when no Firebase project is configured.
+3. **A JSON file would strand the rest of the app.** Ratings, comments, likes
+   and reading progress all live in Firestore. Point the catalogue at
+   `books.json` and those features either break or need rebuilding.
+
+If you *do* want the self-hosted route, the swap is contained: `assets/js/store.js`
+is a single facade over the data layer. Add a `REST` branch that talks to your
+API and the rest of the app — grid, reader, admin UI — stays exactly as it is.
 
 ---
 
@@ -315,6 +400,7 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 ├── index.html              # catalogue, hero, filters, grid
 ├── book.html               # detail page + reader overlay
 ├── library.html            # continue reading / liked / unlocked
+├── admin.html              # admin console (staff-gated)
 ├── preview.html            # generated: single-file offline preview
 ├── 404.html
 ├── tools/
@@ -332,6 +418,7 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 │       ├── comments.js          # shared composer, list, drawer
 │       ├── cards.js             # book card component
 │       ├── banner.js            # launch-banner carousel
+│       ├── admin.js             # admin console controller
 │       ├── reader.js            # pdf.js + epub.js + text engine
 │       ├── app.js               # home page controller
 │       ├── book.js              # detail page controller
@@ -340,7 +427,7 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 ├── storage.rules
 ├── firestore.indexes.json
 ├── firebase.json
-├── seed/                   # Admin SDK seeder
+├── seed/                   # Admin SDK seeder + staff-claim tool
 └── .github/workflows/deploy.yml
 ```
 

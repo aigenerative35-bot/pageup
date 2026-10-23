@@ -35,11 +35,23 @@ service cloud.firestore {
         .hasOnly(['views', 'likes', 'ratingSum', 'ratingCount', 'ratingAvg', 'commentCount']);
     }
 
+    // Shape a book document must satisfy, whoever writes it.
+    function validBook() {
+      return request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.price is number
+        && request.resource.data.price >= 0
+        && request.resource.data.isPremium is bool
+        && request.resource.data.format in ['pdf', 'epub'];
+    }
+
     // ---- books ------------------------------------------------------------
     match /books/{bookId} {
       allow read: if true;
-      allow create, delete: if isStaff();
-      allow update: if isStaff() || (signedIn() && counterOnly());
+      allow create: if isStaff() && validBook();
+      allow delete: if isStaff();
+      allow update: if (isStaff() && validBook()) || (signedIn() && counterOnly());
 
       // ---- likes ----------------------------------------------------------
       match /likes/{uid} {

@@ -45,7 +45,7 @@ export function setUid(uid) { window.__pageup_uid = uid; }
 export async function listBooks(opts = {}) {
   if (!DEMO) return data.listBooks(opts);
   const { sort = 'trending', category = 'all', search = '', pageSize = 24, page = 0 } = opts;
-  let items = DEMO_BOOKS.map((b) => {
+  let items = baseBooks().map((b) => {
     const local = state.books[b.id] || {};
     return {
       ...b, ...local,
@@ -64,10 +64,24 @@ export async function listBooks(opts = {}) {
       b.author.toLowerCase().includes(q) ||
       (b.tags || []).some((t) => t.toLowerCase().includes(q)));
   }
-  const key = { newest: (b) => -(b.publishedYear || 0), rating: (b) => b.ratingAvg, views: (b) => b.views, likes: (b) => b.likes, trending: (b) => b.trendScore }[sort] || ((b) => b.trendScore);
-  items.sort((a, b) => key(b) - key(a));
+  if (sort === 'title') {
+    items.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+  } else {
+    const key = { newest: (b) => -(b.publishedYear || 0), rating: (b) => b.ratingAvg, views: (b) => b.views, likes: (b) => b.likes, trending: (b) => b.trendScore }[sort] || ((b) => b.trendScore);
+    items.sort((a, b) => key(b) - key(a));
+  }
   const start = page * pageSize;
   return { items: items.slice(start, start + pageSize), cursor: null, hasMore: start + pageSize < items.length };
+}
+
+/** Seeded catalogue plus anything added from the admin panel in preview mode. */
+function baseBooks() {
+  return DEMO_BOOKS.concat(state.customBooks || [])
+    .map((b) => ({ ...b, ...((state.edits || {})[b.id] || {}) }));
+}
+
+function bookById(id) {
+  return baseBooks().find((b) => b.id === id) || null;
 }
 
 /* Three seeded sample comments per title, plus anything posted locally. */
@@ -86,7 +100,7 @@ function aggFrom(bookId, base) {
 
 export async function getBook(id) {
   if (!DEMO) return data.getBook(id);
-  const base = DEMO_BOOKS.find((b) => b.id === id);
+  const base = bookById(id);
   if (!base) return null;
   const local = state.books[id] || {};
   return {
@@ -112,7 +126,7 @@ export function registerView(id) {
 
 export async function listFeatured(limitCount = 7) {
   if (!DEMO) return data.listFeatured(limitCount);
-  const merged = DEMO_BOOKS.map((b) => {
+  const merged = baseBooks().map((b) => {
     const local = state.books[b.id] || {};
     return {
       ...b, ...local,
@@ -131,7 +145,7 @@ export async function listFeatured(limitCount = 7) {
 export async function getCategories() {
   if (!DEMO) return data.getCategories();
   const counts = new Map();
-  DEMO_BOOKS.forEach((b) => counts.set(b.category, (counts.get(b.category) || 0) + 1));
+  baseBooks().forEach((b) => counts.set(b.category, (counts.get(b.category) || 0) + 1));
   return [...counts.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
 }
 
@@ -290,4 +304,82 @@ export function getProgress(bookId) {
 }
 export function getAllProgress() {
   try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); } catch { return {}; }
+}
+
+/* ==========================================================================
+   Admin — preview-mode equivalents
+   In preview mode there is no server, so writes land in localStorage. The
+   admin UI says so on screen; connect Firebase and the same calls hit
+   Firestore and Storage instead.
+   ========================================================================== */
+
+function readAsDataURL(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onprogress = (e) => { if (e.lengthComputable) onProgress?.(Math.round((e.loaded / e.total) * 100)); };
+    reader.onload = () => { onProgress?.(100); resolve(String(reader.result)); };
+    reader.onerror = () => reject(new Error('Could not read that file.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function createBook(id, input) {
+  if (!DEMO) return data.createBook(id, input);
+  const book = data.normalizeBook(input);
+  book.id = id || `local-${Date.now().toString(36)}`;
+  book.createdAt = new Date().toISOString();
+  Object.assign(book, { views: 0, likes: 0, commentCount: 0, ratingSum: 0, ratingCount: 0, ratingAvg: 0, trendScore: 0 });
+  state.customBooks = state.customBooks || [];
+  state.customBooks.unshift(book);
+  save();
+  return book.id;
+}
+
+export async function updateBook(id, input) {
+  if (!DEMO) return data.updateBook(id, input);
+  const book = data.normalizeBook(input);
+  state.edits = state.edits || {};
+  const isCustom = (state.customBooks || []).some((b) => b.id === id);
+  if (isCustom) {
+    state.customBooks = state.customBooks.map((b) => (b.id === id ? { ...b, ...book } : b));
+  } else {
+    state.edits[id] = { ...(state.edits[id] || {}), ...book };
+  }
+  save();
+  return id;
+}
+
+export async function removeBook(id) {
+  if (!DEMO) return data.removeBook(id);
+  state.customBooks = (state.customBooks || []).filter((b) => b.id !== id);
+  if (state.edits) delete state.edits[id];
+  save();
+}
+
+export async function uploadAsset(kind, bookId, file, onProgress) {
+  if (!DEMO) return data.uploadAsset(kind, bookId, file, onProgress);
+  if (kind === 'cover') {
+    if (file.size > 400 * 1024) {
+      throw new Error('Preview mode stores covers under 400 KB. Connect Firebase for full-size uploads.');
+    }
+    return { url: await readAsDataURL(file, onProgress), path: '' };
+  }
+  // Book files can be large; keep them in memory for this session only.
+  onProgress?.(100);
+  return { url: URL.createObjectURL(file), path: '' };
+}
+
+export async function removeAsset() { /* nothing is stored in preview mode */ }
+
+export async function adminStats() {
+  const { items } = await listBooks({ sort: 'title', pageSize: 500 });
+  return {
+    books: items.length,
+    premium: items.filter((b) => b.isPremium).length,
+    free: items.filter((b) => !b.isPremium).length,
+    featured: items.filter((b) => b.featured).length,
+    reads: items.reduce((a, b) => a + (b.views || 0), 0),
+    likes: items.reduce((a, b) => a + (b.likes || 0), 0),
+    comments: items.reduce((a, b) => a + (b.commentCount || 0), 0),
+  };
 }

@@ -26,7 +26,7 @@ jobs:
       - name: Stage the site
         run: |
           mkdir -p _site
-          cp index.html book.html library.html 404.html preview.html _site/
+          cp index.html book.html library.html admin.html 404.html preview.html _site/
           cp -r assets _site/assets
           # .nojekyll keeps Pages from running the files through Jekyll
           touch _site/.nojekyll

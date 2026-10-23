@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "seed": "node seed.js",
-    "seed:emulator": "FIRESTORE_EMULATOR_HOST=localhost:8080 node seed.js --emulator"
+    "seed:emulator": "FIRESTORE_EMULATOR_HOST=localhost:8080 node seed.js --emulator",
+    "grant-staff": "node grant-staff.js",
+    "list-staff": "node grant-staff.js --list"
   },
   "dependencies": {
     "firebase-admin": "^12.5.0"
