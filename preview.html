@@ -373,11 +373,16 @@ body.has-shell { padding-top: var(--topbar-h); padding-left: var(--sidebar-w); }
 /* ------------------------------ Book grid ------------------------------- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(214px, 1fr));
-  gap: 18px;
-  padding-bottom: 48px;
+  grid-template-columns: repeat(auto-fill, minmax(206px, 1fr));
+  gap: 22px 16px;
+  padding-bottom: 40px;
 }
-@media (max-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; } }
+/* Fixed column counts per breakpoint, the way a video grid is laid out. */
+@media (min-width: 1560px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (min-width: 1240px) and (max-width: 1559px) { .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (min-width: 980px) and (max-width: 1239px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 720px) and (max-width: 979px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 719px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 10px; } }
 
 .card {
   position: relative; display: flex; flex-direction: column;
@@ -438,7 +443,7 @@ body.has-shell { padding-top: var(--topbar-h); padding-left: var(--sidebar-w); }
 .overlay-btn--primary { background: var(--accent); border-color: transparent; }
 .overlay-btn--primary:hover { background: var(--accent-600); }
 
-.card__body { display: flex; flex-direction: column; gap: 8px; padding: 12px; flex: 1; }
+.card__body { display: flex; flex-direction: column; gap: 7px; padding: 11px 12px 12px; flex: 1; }
 .card__title {
   font-size: 13.5px; font-weight: 600; line-height: 1.4;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
@@ -716,6 +721,52 @@ body.has-shell { padding-top: var(--topbar-h); padding-left: var(--sidebar-w); }
 .footer-col a:hover { color: var(--accent); }
 .footer-bottom { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 12.5px; color: var(--text-3); }
 
+/* ------------------------------ Motion ---------------------------------- */
+@keyframes slideInRight { from { opacity: 0; transform: translateX(28px); } }
+@keyframes slideInUp    { from { opacity: 0; transform: translateY(16px); } }
+@keyframes spin         { to { transform: rotate(360deg); } }
+
+/* Every route change slides its content in from the right. */
+.view-enter { animation: slideInRight .34s var(--ease) backwards; }
+
+/* Cards rise in one after another. `backwards` (not `both`) so the hover
+   lift still works once the entrance has finished. */
+.card { animation: slideInUp .42s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 28ms); }
+
+/* Lazily fetched cover images fade in when they arrive. */
+img.js-lazy { opacity: 0; transition: opacity .4s var(--ease); }
+img.js-lazy.is-loaded { opacity: 1; }
+
+/* Quick comment, typed straight from the grid. */
+.card__quickcomment { display: flex; flex-direction: column; gap: 7px; }
+.card__quickcomment textarea {
+  width: 100%; min-height: 60px; resize: none; padding: 8px 10px;
+  border-radius: var(--r-sm); font-size: 12.5px; line-height: 1.5;
+  border: 1px solid rgba(255, 255, 255, .3);
+  background: rgba(255, 255, 255, .14); color: #fff;
+}
+.card__quickcomment textarea::placeholder { color: rgba(255, 255, 255, .62); }
+.card__quickcomment textarea:focus { outline: none; border-color: #fff; background: rgba(255, 255, 255, .2); }
+
+/* Scroll-loading indicator */
+.load-more { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 0 44px; color: var(--text-3); font-size: 13px; }
+.spinner {
+  width: 17px; height: 17px; border-radius: 50%; flex: 0 0 auto;
+  border: 2px solid var(--border-strong); border-top-color: var(--accent);
+  animation: spin .7s linear infinite;
+}
+.load-more--done { color: var(--text-3); font-size: 12.5px; padding-bottom: 40px; }
+
+/* Respect the OS "reduce motion" setting. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ------------------------------ Utility --------------------------------- */
 .muted { color: var(--text-3); }
 .small { font-size: 13px; }
@@ -980,6 +1031,45 @@ function icon(name, cls = '') {
   return raw.replace('<svg ', `<svg class="${cls}" `);
 }
 
+/* --------------------------- Lazy images -------------------------------- */
+/* Covers are marked with data-src and swapped in only as they approach the
+   viewport, then faded in. Keeps a long catalogue cheap to scroll. */
+let imgObserver = null;
+
+function activateLazyImages(root = document) {
+  const imgs = Array.from(root.querySelectorAll('img.js-lazy[data-src]:not(.is-loaded)'));
+  if (!imgs.length) return;
+
+  const show = (img) => {
+    img.src = img.dataset.src;
+    img.removeAttribute('data-src');
+    const done = () => img.classList.add('is-loaded');
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  };
+
+  if (!('IntersectionObserver' in window)) { imgs.forEach(show); return; }
+
+  if (!imgObserver) {
+    imgObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        imgObserver.unobserve(entry.target);
+        show(entry.target);
+      });
+    }, { rootMargin: '400px 0px' });
+  }
+  imgs.forEach((img) => imgObserver.observe(img));
+}
+
+/** <div class="load-more"><span class="spinner"></span>Loading more books...</div> */
+function loadMoreIndicator(text = 'Loading more books...') {
+  return el('div', { class: 'load-more' }, [
+    el('span', { class: 'spinner' }),
+    el('span', { text }),
+  ]);
+}
+
 /* ------------------------------ Misc ------------------------------------ */
 function copyToClipboard(text) {
   if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
@@ -1062,6 +1152,36 @@ I have written many things in Indian Home Rule. I have said that the British Gov
   einstein: `In your schooldays most of you who read this book made acquaintance with the noble building of Euclid's geometry, and you remember—perhaps with more respect than love—the magnificent structure, on the lofty staircase of which you were chased about for uncounted hours by conscientious teachers.
 
 The sole purpose of this book is to present the theory of relativity in as simple and comprehensible a form as possible to readers who are interested in the theory but are not conversant with the mathematical apparatus of theoretical physics.`,
+  timeMachine: `The Time Traveller (for so it will be convenient to speak of him) was expounding a recondite matter to us. His grey eyes shone and twinkled, and his usually pale face was flushed and animated.
+
+The fire burned brightly, and the soft radiance of the incandescent lights in the lilies of silver caught the bubbles that flashed and passed in our glasses.
+
+Our chairs, being his patents, embraced and caressed us rather than submitted to be sat upon, and there was that luxurious after-dinner atmosphere when thought roams gracefully free of the trammels of precision.`,
+  treasure: `Squire Trelawney, Dr. Livesey, and the rest of these gentlemen having asked me to write down the whole particulars about Treasure Island, from the beginning to the end, keeping nothing back but the bearings of the island, and that only because there is still treasure not yet lifted, I take up my pen in the year of grace 17-- and go back to the time when my father kept the Admiral Benbow inn.
+
+I remember him as if it were yesterday, as he came plodding to the inn door, his sea-chest following behind him in a hand-barrow.`,
+  janeEyre: `There was no possibility of taking a walk that day. We had been wandering, indeed, in the leafless shrubbery an hour in the morning; but since dinner the cold winter wind had brought with it clouds so sombre, and a rain so penetrating, that further out-door exercise was now out of the question.
+
+I was glad of it: I never liked long walks, especially on chilly afternoons: dreadful to me was the coming home in the raw twilight, with nipped fingers and toes.`,
+  expectations: `My father's family name being Pirrip, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called Pip.
+
+I give Pirrip as my father's family name, on the authority of his tombstone and my sister -- Mrs. Joe Gargery, who married the blacksmith.
+
+Ours was the marsh country, down by the river, within, as the river wound, twenty miles of the sea.`,
+  dorian: `The studio was filled with the rich odour of roses, and when the light summer wind stirred amidst the trees of the garden, there came through the open door the heavy scent of the lilac, or the more delicate perfume of the pink-flowering thorn.
+
+From the corner of the divan of Persian saddle-bags on which he was lying, smoking, as was his custom, innumerable cigarettes, Lord Henry Wotton could just catch the gleam of the honey-sweet and honey-coloured blossoms of a laburnum.`,
+  prince: `All states, all powers, that have held and hold rule over men have been and are either republics or principalities.
+
+Principalities are either hereditary, in which the family has been long established; or they are new. The new are either entirely new, as was Milan to Francesco Sforza, or they are, as it were, members annexed to the hereditary state of the prince who has acquired them.`,
+  twoCities: `It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.
+
+We had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way -- in short, the period was so far like the present period.`,
+  jungle: `It was seven o'clock of a very warm evening in the Seeonee hills when Father Wolf woke up from his day's rest, scratched himself, yawned, and spread out his paws one after the other to get rid of the sleepy feeling in their tips.
+
+Mother Wolf lay with her big grey nose dropped across her four tumbling, squealing cubs, and the moon shone into the mouth of the cave where they all lived.
+
+"Augrh!" said Father Wolf. "It is time to hunt again."`,
 };
 
 const mk = (o) => ({
@@ -1141,11 +1261,55 @@ const DEMO_BOOKS = [
        description: 'Written as a dialogue, Gandhi sets out his case for swaraj and the means by which it might be won.',
        tags: ['india', 'freedom', 'politics'], pages: 128, publishedYear: 1909, format: 'pdf',
        views: 7620, likes: 890, ratingAvg: 4.3, ratingCount: 214, trendScore: 970, isPremium: true, price: 99, previewPages: 10, isNew: true }),
+  mk({ id: 'demo-timemachine', title: 'The Time Machine', author: 'H. G. Wells', category: 'Science Fiction', excerptKey: 'timeMachine',
+       description: 'An inventor builds a machine that carries him to the year 802,701, and finds what humanity has become.',
+       tags: ['science fiction', 'classic', 'victorian'], pages: 118, publishedYear: 1895, format: 'epub',
+       views: 13980, likes: 1720, ratingAvg: 4.5, ratingCount: 588, trendScore: 1860 }),
+  mk({ id: 'demo-treasure', title: 'Treasure Island', author: 'Robert Louis Stevenson', category: 'Adventure', excerptKey: 'treasure',
+       description: 'A map, a one-legged cook and a boy who has to grow up fast between Bristol and Skeleton Island.',
+       tags: ['pirates', 'adventure', 'classic'], pages: 292, publishedYear: 1883, format: 'epub',
+       views: 11870, likes: 1420, ratingAvg: 4.4, ratingCount: 476, trendScore: 1530 }),
+  mk({ id: 'demo-janeeyre', title: 'Jane Eyre', author: 'Charlotte Bronte', category: 'Fiction', excerptKey: 'janeEyre',
+       description: 'An orphan refuses to be small, and the house she comes to is hiding something on the third floor.',
+       tags: ['gothic', 'romance', 'classic'], pages: 532, publishedYear: 1847, format: 'epub',
+       views: 14520, likes: 1810, ratingAvg: 4.6, ratingCount: 690, trendScore: 1950 }),
+  mk({ id: 'demo-expectations', title: 'Great Expectations', author: 'Charles Dickens', category: 'Fiction', excerptKey: 'expectations',
+       description: 'A blacksmith\'s boy, a convict on the marshes, and a fortune whose source he never questions.',
+       tags: ['classic', 'victorian', 'coming of age'], pages: 505, publishedYear: 1861, format: 'pdf',
+       views: 10960, likes: 1330, ratingAvg: 4.5, ratingCount: 502, trendScore: 1430 }),
+  mk({ id: 'demo-dorian', title: 'The Picture of Dorian Gray', author: 'Oscar Wilde', category: 'Fiction', excerptKey: 'dorian',
+       description: 'A portrait ages so its subject need not, and Wilde makes every line about it quotable.',
+       tags: ['gothic', 'classic', 'philosophy'], pages: 254, publishedYear: 1890, format: 'epub',
+       views: 13040, likes: 1690, ratingAvg: 4.5, ratingCount: 615, trendScore: 1790 }),
+  mk({ id: 'demo-prince', title: 'The Prince', author: 'Niccolo Machiavelli', category: 'Strategy', excerptKey: 'prince',
+       description: 'A short, cold book about how power is actually kept, written for a family that had just lost it.',
+       tags: ['politics', 'strategy', 'classic'], pages: 140, publishedYear: 1532, format: 'pdf',
+       views: 10120, likes: 1180, ratingAvg: 4.3, ratingCount: 392, trendScore: 1280 }),
+  mk({ id: 'demo-twocities', title: 'A Tale of Two Cities', author: 'Charles Dickens', category: 'History', excerptKey: 'twoCities',
+       description: 'London and Paris in the years around the Revolution, and a sacrifice nobody expects.',
+       tags: ['history', 'classic', 'revolution'], pages: 489, publishedYear: 1859, format: 'epub',
+       views: 12240, likes: 1490, ratingAvg: 4.5, ratingCount: 548, trendScore: 1610 }),
+  mk({ id: 'demo-junglebook', title: 'The Jungle Book', author: 'Rudyard Kipling', category: 'Children', excerptKey: 'jungle',
+       description: 'Mowgli is raised by wolves and taught by a bear and a panther, and the tiger never stops waiting.',
+       tags: ['children', 'animals', 'classic'], pages: 210, publishedYear: 1894, format: 'epub',
+       views: 12610, likes: 1510, ratingAvg: 4.4, ratingCount: 486, trendScore: 1640 }),
+  mk({ id: 'demo-liberty', title: 'On Liberty', author: 'John Stuart Mill', category: 'Philosophy', excerptKey: null,
+       description: 'The classic argument for the limits of authority over the individual, and where those limits sit.',
+       tags: ['philosophy', 'politics', 'ethics'], pages: 190, publishedYear: 1859, format: 'pdf',
+       views: 7180, likes: 810, ratingAvg: 4.2, ratingCount: 244, trendScore: 890 }),
+  mk({ id: 'demo-wealth', title: 'An Inquiry into the Nature and Causes of the Wealth of Nations', author: 'Adam Smith', category: 'Economics', excerptKey: null,
+       description: 'The division of labour, the invisible hand, and the book that founded a discipline.',
+       tags: ['economics', 'history', 'classic'], pages: 640, publishedYear: 1776, format: 'pdf',
+       views: 8420, likes: 960, ratingAvg: 4.3, ratingCount: 302, trendScore: 1050, isPremium: true, price: 199, previewPages: 16 }),
+  mk({ id: 'demo-warpeace', title: 'War and Peace', author: 'Leo Tolstoy', category: 'Fiction', excerptKey: null,
+       description: 'Five families, one invasion, and the argument that history is not made by great men.',
+       tags: ['epic', 'history', 'classic'], pages: 1225, publishedYear: 1869, format: 'epub',
+       views: 9640, likes: 1180, ratingAvg: 4.6, ratingCount: 428, trendScore: 1310, isPremium: true, price: 249, previewPages: 18, isNew: true }),
 ];
 
 const DEMO_CATEGORIES = [
-  'Fiction', 'Mystery', 'Horror', 'Philosophy', 'Strategy',
-  'Children', 'Adventure', 'Science', 'History',
+  'Fiction', 'Mystery', 'Horror', 'Philosophy', 'Strategy', 'Children',
+  'Adventure', 'Science', 'History', 'Science Fiction', 'Economics',
 ];
 
 
@@ -1167,6 +1331,11 @@ const FALLBACK_COVER = (book) =>
      </div>
    </div>`;
 
+/**
+ * Cover image. Real covers are lazily fetched: the element ships with
+ * data-src and is only given a src when it nears the viewport
+ * (see activateLazyImages in util.js).
+ */
 function bookThumb(book, { lazy = true } = {}) {
   if (!book.coverUrl) {
     const wrap = el('div', { html: FALLBACK_COVER(book) });
@@ -1174,14 +1343,17 @@ function bookThumb(book, { lazy = true } = {}) {
   }
   const img = el('img', {
     alt: `Cover of ${book.title || 'book'}`,
-    loading: lazy ? 'lazy' : 'eager',
+    loading: 'lazy',
     decoding: 'async',
-    src: book.coverUrl,
+    class: lazy ? 'js-lazy' : '',
+    ...(lazy ? { 'data-src': book.coverUrl } : { src: book.coverUrl }),
   });
   img.addEventListener('error', () => {
+    img.classList.add('is-loaded');
     const wrap = el('div', { html: FALLBACK_COVER(book) });
     img.replaceWith(wrap.firstElementChild);
   });
+  if (!lazy) img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
   return img;
 }
 
@@ -1190,17 +1362,23 @@ function bookThumb(book, { lazy = true } = {}) {
  * @param {object} opts
  * @param {boolean} opts.liked
  * @param {boolean} opts.unlocked
+ * @param {number}  opts.index          position in the grid, drives the stagger
  * @param {(book, btn) => void} opts.onLike
- * @param {(book) => void} opts.onComment
+ * @param {(book) => void} opts.onComment      open the full comments panel
+ * @param {(book, text) => Promise<void>} opts.onQuickComment
  * @param {(book) => void} opts.onShare
  */
-function renderBookCard(book, { liked = false, unlocked = false, onLike, onComment, onShare } = {}) {
+function renderBookCard(book, {
+  liked = false, unlocked = false, index = 0,
+  onLike, onComment, onQuickComment, onShare,
+} = {}) {
   const rating = book.ratingAvg || 0;
   const format = (book.format || 'pdf').toLowerCase();
   const locked = book.isPremium && !unlocked;
   const comments = book.commentCount || 0;
 
   const card = el('article', { class: 'card', dataset: { id: book.id } });
+  card.style.setProperty('--i', String(index % 24));
 
   /* ---- cover ---- */
   const thumb = el('a', {
@@ -1224,7 +1402,8 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onComme
 
   /* ---- hover overlay ---- */
   const overlay = el('div', { class: 'card__overlay' });
-  if (book.description) overlay.append(el('p', { text: book.description }));
+  const desc = book.description ? el('p', { text: book.description }) : null;
+  if (desc) overlay.append(desc);
 
   const actions = el('div', { class: 'card__overlay-actions card__overlay-actions--stacked' });
 
@@ -1241,9 +1420,9 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onComme
   }, [el('span', { html: liked ? icon('heartF') : icon('heart') }), el('span', { class: 'js-like-count', text: formatCount(book.likes || 0) })]);
   likeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onLike?.(book, likeBtn); });
 
-  const commentBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Comments' },
+  const commentBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Write a comment' },
     [el('span', { html: icon('comment') }), el('span', { class: 'js-comment-count', text: formatCount(comments) })]);
-  commentBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onComment?.(book); });
+  commentBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showQuick(); });
 
   const shareBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Share' },
     [el('span', { html: icon('share') })]);
@@ -1252,6 +1431,66 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onComme
   row.append(likeBtn, commentBtn, shareBtn);
   actions.append(readBtn, row);
   overlay.append(actions);
+
+  /* ---- quick comment: write a review without leaving the grid ---- */
+  const quick = el('div', { class: 'card__quickcomment hidden' });
+  const qInput = el('textarea', {
+    rows: '3', placeholder: 'Write a comment...',
+    'aria-label': `Write a comment on ${book.title}`,
+  });
+  const qRow = el('div', { class: 'overlay-row' });
+
+  const qPost = el('button', { class: 'overlay-btn overlay-btn--primary', type: 'button' },
+    [el('span', { html: icon('check') }), el('span', { text: 'Post' })]);
+  const qCancel = el('button', { class: 'overlay-btn', type: 'button', text: 'Cancel' });
+  const qViewAll = el('button', { class: 'overlay-btn', type: 'button', title: 'Read all comments' },
+    [el('span', { html: icon('list') }), el('span', { text: 'View' })]);
+
+  qRow.append(qPost, qViewAll, qCancel);
+  quick.append(qInput, qRow);
+  overlay.append(quick);
+
+  function showQuick() {
+    actions.classList.add('hidden');
+    if (desc) desc.classList.add('hidden');
+    quick.classList.remove('hidden');
+    setTimeout(() => qInput.focus(), 30);
+  }
+  function hideQuick() {
+    quick.classList.add('hidden');
+    actions.classList.remove('hidden');
+    if (desc) desc.classList.remove('hidden');
+  }
+  function bumpCount(n) {
+    card.querySelectorAll('.js-comment-count').forEach((node) => { node.textContent = formatCount(n); });
+  }
+
+  qCancel.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); qInput.value = ''; hideQuick(); });
+  qViewAll.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); hideQuick(); onComment?.(book); });
+  qPost.addEventListener('click', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const text = qInput.value.trim();
+    if (!text) { qInput.focus(); return; }
+    qPost.disabled = true;
+    try {
+      await onQuickComment?.(book, text);
+      qInput.value = '';
+      hideQuick();
+      const next = Number(card.dataset.comments || comments) + 1;
+      card.dataset.comments = String(next);
+      bumpCount(next);
+    } catch (err) {
+      console.error(err); // the parent surfaces the reason
+    } finally {
+      qPost.disabled = false;
+    }
+  });
+  qInput.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') qPost.click();
+  });
+  qInput.addEventListener('click', (e) => e.stopPropagation());
+
   thumb.append(overlay);
   card.append(thumb);
 
@@ -1273,7 +1512,7 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onComme
 
   const footerComment = el('button', {
     class: 'card__comment', type: 'button',
-    title: comments ? `${comments} comment${comments === 1 ? '' : 's'}` : 'Be the first to comment',
+    title: comments ? `Read ${comments} comment${comments === 1 ? '' : 's'}` : 'Be the first to comment',
     html: `${icon('comment')}<span class="js-comment-count">${formatCount(comments)}</span>`,
   });
   footerComment.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onComment?.(book); });
@@ -1329,7 +1568,18 @@ function skeletonCard() {
   var sort = 'trending';
   var category = 'all';
   var search = '';
+  var visible = 8;            // scroll-loading: how many books are rendered
+  var PAGE = 4;               // how many more arrive per scroll
   var VIEW = document.getElementById('view');
+
+  /** Replay the slide-in transition on the content pane. */
+  function enterView() {
+    var main = document.querySelector('main');
+    if (!main) return;
+    main.classList.remove('view-enter');
+    void main.offsetWidth;
+    main.classList.add('view-enter');
+  }
 
   /* ------------------------------------------------------- demo helpers -- */
   function bookById(id) {
@@ -1479,12 +1729,13 @@ function skeletonCard() {
     var clear = document.getElementById('searchClear');
     var run = debounce(function () {
       search = input.value.trim();
+      visible = 8;
       clear.classList.toggle('hidden', !input.value);
       if (route().name === 'home') paintGrid(); else location.hash = '#/';
     }, 260);
     input.addEventListener('input', run);
     clear.addEventListener('click', function () {
-      input.value = ''; search = ''; clear.classList.add('hidden'); input.focus();
+      input.value = ''; search = ''; visible = 8; clear.classList.add('hidden'); input.focus();
       if (route().name === 'home') paintGrid(); else location.hash = '#/';
     });
     document.getElementById('searchForm').addEventListener('submit', function (e) { e.preventDefault(); run(); });
@@ -1574,7 +1825,7 @@ function skeletonCard() {
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>' +
             '<span>Catalogue</span></div>' +
           '<h1>Discover books</h1>' +
-          '<p id="resultMeta">Every premium title opens with a free preview — no card, no signup wall.</p>' +
+          '<p>Every premium title opens with a free preview — no card, no signup wall.</p>' +
         '</div>' +
         '<div class="row gap-12">' +
           '<label class="sr-only" for="sortSelect">Sort books</label>' +
@@ -1606,8 +1857,12 @@ function skeletonCard() {
         '<div class="filterbar">' +
           '<span class="hint" style="font-weight:600;color:var(--text-2)">Category</span>' +
           '<div class="chipbar" id="chipbar" role="group" aria-label="Filter by category"></div>' +
+          '<span class="spacer"></span>' +
+          '<span class="hint" id="resultMeta"></span>' +
         '</div>' +
         '<div class="grid" id="bookGrid"></div>' +
+        '<div id="loadStatus" class="hidden"></div>' +
+        '<div id="loadSentinel" style="height:1px"></div>' +
       '</section>' +
 
       '<section style="padding:8px 0 36px">' +
@@ -1630,7 +1885,7 @@ function skeletonCard() {
 
     var sel = document.getElementById('sortSelect');
     sel.value = sort;
-    sel.addEventListener('change', function (e) { sort = e.target.value; paintChips(); paintGrid(); paintSidebar(); });
+    sel.addEventListener('change', function (e) { sort = e.target.value; visible = 8; paintChips(); paintGrid(); paintSidebar(); });
     paintChips();
     paintGrid();
   }
@@ -1642,10 +1897,12 @@ function skeletonCard() {
     var list = [{ name: 'all', label: 'All books' }].concat(categories().map(function (c) { return { name: c, label: c }; }));
     list.forEach(function (c) {
       var btn = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(category === c.name), text: c.label });
-      btn.addEventListener('click', function () { category = c.name; paintChips(); paintGrid(); paintSidebar(); });
+      btn.addEventListener('click', function () { category = c.name; visible = 8; paintChips(); paintGrid(); paintSidebar(); });
       host.append(btn);
     });
   }
+
+  var gridObserver = null;
 
   function paintGrid() {
     var grid = document.getElementById('bookGrid');
@@ -1659,19 +1916,89 @@ function skeletonCard() {
       if (search) bits.push('for \u201C' + search + '\u201D');
       if (category !== 'all') bits.push('in ' + category);
       meta.textContent = bits.join(' ');
+      meta.style.whiteSpace = 'nowrap';
     }
 
     if (!items.length) {
       grid.append(el('div', { class: 'empty', html: icon('search') +
         '<h3>No books matched</h3><p>Try a different search term or clear the category filter.</p>' }));
+      paintLoadStatus(0);
       return;
     }
-    items.forEach(function (book) {
-      grid.append(renderBookCard(book, {
-        liked: book.liked, unlocked: book.unlocked,
-        onLike: onLike, onComment: function (b) { openCommentsDrawer(b); }, onShare: onShare
+
+    appendPage(items.slice(0, visible), 0);
+    paintLoadStatus(items.length);
+
+    /* Scroll loading: pull in the next batch as the sentinel approaches. */
+    var sentinel = document.getElementById('loadSentinel');
+    if (sentinel && 'IntersectionObserver' in window) {
+      if (gridObserver) gridObserver.disconnect();
+      gridObserver = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        var shown = grid.querySelectorAll('.card').length;
+        var all = catalogue();
+        if (shown >= all.length) { paintLoadStatus(all.length); return; }
+        paintLoadStatus(all.length, true);
+        setTimeout(function () {
+          appendPage(all.slice(shown, shown + PAGE), shown);
+          paintLoadStatus(all.length);
+        }, 420);
+      }, { rootMargin: '500px 0px' });
+      gridObserver.observe(sentinel);
+    }
+  }
+
+  function appendPage(items, offset) {
+    var grid = document.getElementById('bookGrid');
+    var frag = document.createDocumentFragment();
+    items.forEach(function (book, i) {
+      frag.append(renderBookCard(book, {
+        liked: book.liked, unlocked: book.unlocked, index: i,
+        onLike: onLike,
+        onComment: function (b) { openCommentsDrawer(b); },
+        onQuickComment: quickComment,
+        onShare: onShare
       }));
     });
+    grid.append(frag);
+    activateLazyImages(grid);
+  }
+
+  function paintLoadStatus(total, loading) {
+    var host = document.getElementById('loadStatus');
+    if (!host) return;
+    host.innerHTML = '';
+    var shown = document.querySelectorAll('#bookGrid .card').length;
+    if (loading) {
+      host.classList.remove('hidden');
+      host.append(loadMoreIndicator('Loading more books...'));
+    } else if (shown < total) {
+      host.classList.remove('hidden');
+      var btn = el('button', { class: 'btn btn--ghost' }, [
+        el('span', { html: icon('book') }), el('span', { text: 'Load more books' })
+      ]);
+      btn.addEventListener('click', function () {
+        paintLoadStatus(total, true);
+        setTimeout(function () { appendPage(catalogue().slice(shown, shown + PAGE), shown); paintLoadStatus(total); }, 380);
+      });
+      host.append(btn);
+    } else {
+      host.classList.remove('hidden');
+      host.append(el('div', { class: 'load-more--done', text: 'You have reached the end \u00b7 ' + total + ' books' }));
+    }
+  }
+
+  /** Quick comment straight from a grid card. */
+  function quickComment(book, text) {
+    var list = state.comments[book.id] || (state.comments[book.id] = []);
+    list.unshift({
+      id: 'c-' + Date.now(), name: 'Guest reader', text: String(text).slice(0, 2000),
+      likes: 0, createdAt: new Date().toISOString()
+    });
+    save();
+    refreshComments(book.id);
+    toast('Comment posted', 'success');
+    return Promise.resolve();
   }
 
   /* ------------------------------------------------------------- detail -- */
@@ -2287,6 +2614,7 @@ function skeletonCard() {
     });
     if (params.cat) category = params.cat;
     if (params.sort) sort = params.sort;
+    visible = 8;
     return { name: 'home' };
   }
 
@@ -2300,6 +2628,7 @@ function skeletonCard() {
     else if (r.name === 'library') { renderLibrary(r.panel); window.scrollTo(0, 0); }
     else { document.title = 'PageUp \u2014 Read unlimited. Pay only for what you love.'; renderHome(); }
     paintSidebar();
+    enterView();
   }
 
   /* ------------------------------------------------------------ library -- */
@@ -2364,11 +2693,14 @@ function skeletonCard() {
           '<a class="btn btn--primary mt-16" href="#/">Browse the catalogue</a>' }));
         return;
       }
-      rows.forEach(function (row) {
+      rows.forEach(function (row, idx) {
         var b = p === 'continue' ? row.book : row;
         var card = renderBookCard(b, {
-          liked: b.liked, unlocked: true,
-          onLike: onLike, onComment: function (x) { openCommentsDrawer(x); }, onShare: onShare
+          liked: b.liked, unlocked: true, index: idx,
+          onLike: onLike,
+          onComment: function (x) { openCommentsDrawer(x); },
+          onQuickComment: quickComment,
+          onShare: onShare
         });
         if (p === 'continue') {
           var total = b.pages || 100;

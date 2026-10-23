@@ -56,6 +56,36 @@ I have written many things in Indian Home Rule. I have said that the British Gov
   einstein: `In your schooldays most of you who read this book made acquaintance with the noble building of Euclid's geometry, and you remember—perhaps with more respect than love—the magnificent structure, on the lofty staircase of which you were chased about for uncounted hours by conscientious teachers.
 
 The sole purpose of this book is to present the theory of relativity in as simple and comprehensible a form as possible to readers who are interested in the theory but are not conversant with the mathematical apparatus of theoretical physics.`,
+  timeMachine: `The Time Traveller (for so it will be convenient to speak of him) was expounding a recondite matter to us. His grey eyes shone and twinkled, and his usually pale face was flushed and animated.
+
+The fire burned brightly, and the soft radiance of the incandescent lights in the lilies of silver caught the bubbles that flashed and passed in our glasses.
+
+Our chairs, being his patents, embraced and caressed us rather than submitted to be sat upon, and there was that luxurious after-dinner atmosphere when thought roams gracefully free of the trammels of precision.`,
+  treasure: `Squire Trelawney, Dr. Livesey, and the rest of these gentlemen having asked me to write down the whole particulars about Treasure Island, from the beginning to the end, keeping nothing back but the bearings of the island, and that only because there is still treasure not yet lifted, I take up my pen in the year of grace 17-- and go back to the time when my father kept the Admiral Benbow inn.
+
+I remember him as if it were yesterday, as he came plodding to the inn door, his sea-chest following behind him in a hand-barrow.`,
+  janeEyre: `There was no possibility of taking a walk that day. We had been wandering, indeed, in the leafless shrubbery an hour in the morning; but since dinner the cold winter wind had brought with it clouds so sombre, and a rain so penetrating, that further out-door exercise was now out of the question.
+
+I was glad of it: I never liked long walks, especially on chilly afternoons: dreadful to me was the coming home in the raw twilight, with nipped fingers and toes.`,
+  expectations: `My father's family name being Pirrip, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called Pip.
+
+I give Pirrip as my father's family name, on the authority of his tombstone and my sister -- Mrs. Joe Gargery, who married the blacksmith.
+
+Ours was the marsh country, down by the river, within, as the river wound, twenty miles of the sea.`,
+  dorian: `The studio was filled with the rich odour of roses, and when the light summer wind stirred amidst the trees of the garden, there came through the open door the heavy scent of the lilac, or the more delicate perfume of the pink-flowering thorn.
+
+From the corner of the divan of Persian saddle-bags on which he was lying, smoking, as was his custom, innumerable cigarettes, Lord Henry Wotton could just catch the gleam of the honey-sweet and honey-coloured blossoms of a laburnum.`,
+  prince: `All states, all powers, that have held and hold rule over men have been and are either republics or principalities.
+
+Principalities are either hereditary, in which the family has been long established; or they are new. The new are either entirely new, as was Milan to Francesco Sforza, or they are, as it were, members annexed to the hereditary state of the prince who has acquired them.`,
+  twoCities: `It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.
+
+We had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way -- in short, the period was so far like the present period.`,
+  jungle: `It was seven o'clock of a very warm evening in the Seeonee hills when Father Wolf woke up from his day's rest, scratched himself, yawned, and spread out his paws one after the other to get rid of the sleepy feeling in their tips.
+
+Mother Wolf lay with her big grey nose dropped across her four tumbling, squealing cubs, and the moon shone into the mouth of the cave where they all lived.
+
+"Augrh!" said Father Wolf. "It is time to hunt again."`,
 };
 
 const mk = (o) => ({
@@ -135,9 +165,53 @@ export const DEMO_BOOKS = [
        description: 'Written as a dialogue, Gandhi sets out his case for swaraj and the means by which it might be won.',
        tags: ['india', 'freedom', 'politics'], pages: 128, publishedYear: 1909, format: 'pdf',
        views: 7620, likes: 890, ratingAvg: 4.3, ratingCount: 214, trendScore: 970, isPremium: true, price: 99, previewPages: 10, isNew: true }),
+  mk({ id: 'demo-timemachine', title: 'The Time Machine', author: 'H. G. Wells', category: 'Science Fiction', excerptKey: 'timeMachine',
+       description: 'An inventor builds a machine that carries him to the year 802,701, and finds what humanity has become.',
+       tags: ['science fiction', 'classic', 'victorian'], pages: 118, publishedYear: 1895, format: 'epub',
+       views: 13980, likes: 1720, ratingAvg: 4.5, ratingCount: 588, trendScore: 1860 }),
+  mk({ id: 'demo-treasure', title: 'Treasure Island', author: 'Robert Louis Stevenson', category: 'Adventure', excerptKey: 'treasure',
+       description: 'A map, a one-legged cook and a boy who has to grow up fast between Bristol and Skeleton Island.',
+       tags: ['pirates', 'adventure', 'classic'], pages: 292, publishedYear: 1883, format: 'epub',
+       views: 11870, likes: 1420, ratingAvg: 4.4, ratingCount: 476, trendScore: 1530 }),
+  mk({ id: 'demo-janeeyre', title: 'Jane Eyre', author: 'Charlotte Bronte', category: 'Fiction', excerptKey: 'janeEyre',
+       description: 'An orphan refuses to be small, and the house she comes to is hiding something on the third floor.',
+       tags: ['gothic', 'romance', 'classic'], pages: 532, publishedYear: 1847, format: 'epub',
+       views: 14520, likes: 1810, ratingAvg: 4.6, ratingCount: 690, trendScore: 1950 }),
+  mk({ id: 'demo-expectations', title: 'Great Expectations', author: 'Charles Dickens', category: 'Fiction', excerptKey: 'expectations',
+       description: 'A blacksmith\'s boy, a convict on the marshes, and a fortune whose source he never questions.',
+       tags: ['classic', 'victorian', 'coming of age'], pages: 505, publishedYear: 1861, format: 'pdf',
+       views: 10960, likes: 1330, ratingAvg: 4.5, ratingCount: 502, trendScore: 1430 }),
+  mk({ id: 'demo-dorian', title: 'The Picture of Dorian Gray', author: 'Oscar Wilde', category: 'Fiction', excerptKey: 'dorian',
+       description: 'A portrait ages so its subject need not, and Wilde makes every line about it quotable.',
+       tags: ['gothic', 'classic', 'philosophy'], pages: 254, publishedYear: 1890, format: 'epub',
+       views: 13040, likes: 1690, ratingAvg: 4.5, ratingCount: 615, trendScore: 1790 }),
+  mk({ id: 'demo-prince', title: 'The Prince', author: 'Niccolo Machiavelli', category: 'Strategy', excerptKey: 'prince',
+       description: 'A short, cold book about how power is actually kept, written for a family that had just lost it.',
+       tags: ['politics', 'strategy', 'classic'], pages: 140, publishedYear: 1532, format: 'pdf',
+       views: 10120, likes: 1180, ratingAvg: 4.3, ratingCount: 392, trendScore: 1280 }),
+  mk({ id: 'demo-twocities', title: 'A Tale of Two Cities', author: 'Charles Dickens', category: 'History', excerptKey: 'twoCities',
+       description: 'London and Paris in the years around the Revolution, and a sacrifice nobody expects.',
+       tags: ['history', 'classic', 'revolution'], pages: 489, publishedYear: 1859, format: 'epub',
+       views: 12240, likes: 1490, ratingAvg: 4.5, ratingCount: 548, trendScore: 1610 }),
+  mk({ id: 'demo-junglebook', title: 'The Jungle Book', author: 'Rudyard Kipling', category: 'Children', excerptKey: 'jungle',
+       description: 'Mowgli is raised by wolves and taught by a bear and a panther, and the tiger never stops waiting.',
+       tags: ['children', 'animals', 'classic'], pages: 210, publishedYear: 1894, format: 'epub',
+       views: 12610, likes: 1510, ratingAvg: 4.4, ratingCount: 486, trendScore: 1640 }),
+  mk({ id: 'demo-liberty', title: 'On Liberty', author: 'John Stuart Mill', category: 'Philosophy', excerptKey: null,
+       description: 'The classic argument for the limits of authority over the individual, and where those limits sit.',
+       tags: ['philosophy', 'politics', 'ethics'], pages: 190, publishedYear: 1859, format: 'pdf',
+       views: 7180, likes: 810, ratingAvg: 4.2, ratingCount: 244, trendScore: 890 }),
+  mk({ id: 'demo-wealth', title: 'An Inquiry into the Nature and Causes of the Wealth of Nations', author: 'Adam Smith', category: 'Economics', excerptKey: null,
+       description: 'The division of labour, the invisible hand, and the book that founded a discipline.',
+       tags: ['economics', 'history', 'classic'], pages: 640, publishedYear: 1776, format: 'pdf',
+       views: 8420, likes: 960, ratingAvg: 4.3, ratingCount: 302, trendScore: 1050, isPremium: true, price: 199, previewPages: 16 }),
+  mk({ id: 'demo-warpeace', title: 'War and Peace', author: 'Leo Tolstoy', category: 'Fiction', excerptKey: null,
+       description: 'Five families, one invasion, and the argument that history is not made by great men.',
+       tags: ['epic', 'history', 'classic'], pages: 1225, publishedYear: 1869, format: 'epub',
+       views: 9640, likes: 1180, ratingAvg: 4.6, ratingCount: 428, trendScore: 1310, isPremium: true, price: 249, previewPages: 18, isNew: true }),
 ];
 
 export const DEMO_CATEGORIES = [
-  'Fiction', 'Mystery', 'Horror', 'Philosophy', 'Strategy',
-  'Children', 'Adventure', 'Science', 'History',
+  'Fiction', 'Mystery', 'Horror', 'Philosophy', 'Strategy', 'Children',
+  'Adventure', 'Science', 'History', 'Science Fiction', 'Economics',
 ];

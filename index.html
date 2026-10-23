@@ -28,7 +28,7 @@
           <span>Catalogue</span>
         </div>
         <h1>Discover books</h1>
-        <p id="resultMeta">Every premium title opens with a free preview — no card, no signup wall.</p>
+        <p>Every premium title opens with a free preview — no card, no signup wall.</p>
       </div>
       <div class="row gap-12">
         <label class="sr-only" for="sortSelect">Sort books</label>
@@ -66,13 +66,13 @@
       <div class="filterbar">
         <span class="hint" style="font-weight:600;color:var(--text-2)">Category</span>
         <div class="chipbar" id="chipbar" role="group" aria-label="Filter by category"></div>
+        <span class="spacer"></span>
+        <span class="hint" id="resultMeta"></span>
       </div>
 
       <div class="grid" id="bookGrid"></div>
 
-      <div id="loadMoreWrap" class="hidden" style="display:flex;justify-content:center;padding:0 0 36px">
-        <button class="btn btn--ghost btn--lg" id="loadMore">Load more books</button>
-      </div>
+      <div id="loadStatus" class="hidden"></div>
       <div id="loadSentinel" style="height:1px"></div>
     </section>
 

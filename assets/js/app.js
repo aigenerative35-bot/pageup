@@ -1,19 +1,19 @@
 /* PageUp — home page controller (catalogue grid, filters, search, likes, comments) */
 import {
-  renderShell, initAuth, onSession, shareBook, requireAuth, actorId,
+  renderShell, initAuth, onSession, shareBook, requireAuth, actorId, actorProfile,
   toast, $, el, icon, escapeHtml,
 } from './ui.js';
 import { openCommentsDrawer } from './comments.js';
 import * as store from './store.js';
 import { renderBookCard, skeletonCard } from './cards.js';
-import { debounce } from './util.js';
+import { debounce, activateLazyImages, loadMoreIndicator } from './util.js';
 
 const state = {
   sort: 'trending',
   category: 'all',
   search: '',
   page: 0,
-  pageSize: 24,
+  pageSize: 8,        // small page so scroll-loading is visible in the demo
   items: [],
   hasMore: true,
   loading: false,
@@ -48,11 +48,12 @@ function wireControls() {
   const sel = $('#sortSelect');
   if (sel) { sel.value = state.sort; sel.addEventListener('change', (e) => { state.sort = e.target.value; load(true); }); }
 
+  /* Scroll loading: pull the next page in before the reader reaches the end. */
   const sentinel = $('#loadSentinel');
   if (sentinel && 'IntersectionObserver' in window) {
     new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && state.hasMore && !state.loading) load(false);
-    }, { rootMargin: '600px' }).observe(sentinel);
+    }, { rootMargin: '700px 0px' }).observe(sentinel);
   }
   $('#loadMore')?.addEventListener('click', () => load(false));
 }
@@ -83,7 +84,6 @@ function paintChips() {
 }
 
 async function refreshCategories() {
-  if (store.DEMO) return;
   try {
     const cats = await store.getCategories();
     if (cats.length) { store.demoCategories.length = 0; cats.forEach((c) => store.demoCategories.push(c.name)); }
@@ -102,10 +102,10 @@ async function load(reset) {
     state.items = [];
     state.hasMore = true;
     grid.innerHTML = '';
-    for (let i = 0; i < 8; i++) grid.append(skeletonCard());
-    $('#loadMoreWrap')?.classList.add('hidden');
+    for (let i = 0; i < 10; i++) grid.append(skeletonCard());
+    paintLoadStatus('idle');
   } else {
-    $('#loadMore')?.setAttribute('disabled', '');
+    paintLoadStatus('loading');
   }
 
   try {
@@ -114,11 +114,12 @@ async function load(reset) {
       pageSize: state.pageSize, page: state.page,
     });
     if (reset) grid.innerHTML = '';
+    const offset = state.items.length;
     state.items.push(...res.items);
     state.hasMore = res.hasMore;
     state.page += 1;
     await refreshLikes();
-    renderGrid(res.items);
+    renderGrid(res.items, offset);
     renderResultMeta();
   } catch (err) {
     console.error(err);
@@ -126,22 +127,48 @@ async function load(reset) {
     grid.append(emptyState('Could not load books', err?.message || 'Check your connection and Firebase rules, then reload.'));
   } finally {
     state.loading = false;
-    $('#loadMore')?.removeAttribute('disabled');
-    $('#loadMoreWrap')?.classList.toggle('hidden', !state.hasMore);
+    paintLoadStatus(state.hasMore ? 'idle' : 'done');
   }
 }
 
-function renderGrid(items) {
+function renderGrid(items, offset = 0) {
   const grid = $('#bookGrid');
-  items.forEach((book) => {
-    grid.append(renderBookCard(book, {
+  const frag = document.createDocumentFragment();
+  items.forEach((book, i) => {
+    frag.append(renderBookCard(book, {
       liked: state.liked.has(book.id),
       unlocked: false,
+      index: i,                       // stagger restarts per batch
       onLike: handleLike,
       onComment: handleComment,
+      onQuickComment: handleQuickComment,
       onShare: shareBook,
     }));
   });
+  grid.append(frag);
+  activateLazyImages(grid);
+}
+
+/** The scroll-loading affordance under the grid. */
+function paintLoadStatus(mode) {
+  const host = $('#loadStatus');
+  if (!host) return;
+  host.innerHTML = '';
+  if (mode === 'loading') {
+    host.classList.remove('hidden');
+    host.append(loadMoreIndicator('Loading more books...'));
+  } else if (mode === 'idle') {
+    host.classList.toggle('hidden', !state.items.length);
+    if (!state.items.length) return;
+    const btn = el('button', { class: 'btn btn--ghost', id: 'loadMore' }, [
+      el('span', { html: icon('book') }), el('span', { text: 'Load more books' }),
+    ]);
+    btn.addEventListener('click', () => load(false));
+    host.append(btn);
+  } else {
+    host.classList.remove('hidden');
+    host.append(el('div', { class: 'load-more--done', text: `You have reached the end \u00b7 ${state.items.length} books` }));
+  }
 }
 
 async function refreshLikes() {
@@ -178,7 +205,7 @@ async function handleLike(book, btn) {
   } catch (err) { console.error(err); toast('Could not update like', 'error'); }
 }
 
-/** Comments open in a slide-over so the reader never loses their place. */
+/** Full comments panel — read the thread. */
 function handleComment(book) {
   openCommentsDrawer(book, {
     onCount: (n) => {
@@ -186,6 +213,18 @@ function handleComment(book) {
         .forEach((node) => { node.textContent = String(n); });
     },
   });
+}
+
+/** Quick comment — write straight from the grid card. */
+async function handleQuickComment(book, text) {
+  if (!requireAuth('comment')) throw new Error('Sign in required');
+  try {
+    await store.addComment(book.id, actorProfile(), text);
+    toast('Comment posted', 'success');
+  } catch (err) {
+    toast('Could not post comment', 'error');
+    throw err;
+  }
 }
 
 function renderResultMeta() {
@@ -197,6 +236,7 @@ function renderResultMeta() {
   if (state.category !== 'all') bits.push(`in ${state.category}`);
   host.textContent = bits.join(' ');
   host.classList.toggle('hidden', n === 0 && !state.search);
+  host.style.whiteSpace = 'nowrap';
 }
 
 function emptyState(title, msg) {

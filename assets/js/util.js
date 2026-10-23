@@ -143,6 +143,45 @@ export function icon(name, cls = '') {
   return raw.replace('<svg ', `<svg class="${cls}" `);
 }
 
+/* --------------------------- Lazy images -------------------------------- */
+/* Covers are marked with data-src and swapped in only as they approach the
+   viewport, then faded in. Keeps a long catalogue cheap to scroll. */
+let imgObserver = null;
+
+export function activateLazyImages(root = document) {
+  const imgs = Array.from(root.querySelectorAll('img.js-lazy[data-src]:not(.is-loaded)'));
+  if (!imgs.length) return;
+
+  const show = (img) => {
+    img.src = img.dataset.src;
+    img.removeAttribute('data-src');
+    const done = () => img.classList.add('is-loaded');
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  };
+
+  if (!('IntersectionObserver' in window)) { imgs.forEach(show); return; }
+
+  if (!imgObserver) {
+    imgObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        imgObserver.unobserve(entry.target);
+        show(entry.target);
+      });
+    }, { rootMargin: '400px 0px' });
+  }
+  imgs.forEach((img) => imgObserver.observe(img));
+}
+
+/** <div class="load-more"><span class="spinner"></span>Loading more books...</div> */
+export function loadMoreIndicator(text = 'Loading more books...') {
+  return el('div', { class: 'load-more' }, [
+    el('span', { class: 'spinner' }),
+    el('span', { text }),
+  ]);
+}
+
 /* ------------------------------ Misc ------------------------------------ */
 export function copyToClipboard(text) {
   if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);

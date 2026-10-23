@@ -152,6 +152,16 @@ export function renderShell() {
   renderShellAuth();
   renderPlanCard();
   loadNavCategories();
+  enterView();
+}
+
+/** Replay the slide-in transition on the page's main content. */
+export function enterView() {
+  const main = document.querySelector('main');
+  if (!main) return;
+  main.classList.remove('view-enter');
+  void main.offsetWidth;   // force a reflow so the animation restarts
+  main.classList.add('view-enter');
 }
 
 function paintSidebar(current) {

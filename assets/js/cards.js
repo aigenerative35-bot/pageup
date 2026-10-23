@@ -16,6 +16,11 @@ const FALLBACK_COVER = (book) =>
      </div>
    </div>`;
 
+/**
+ * Cover image. Real covers are lazily fetched: the element ships with
+ * data-src and is only given a src when it nears the viewport
+ * (see activateLazyImages in util.js).
+ */
 export function bookThumb(book, { lazy = true } = {}) {
   if (!book.coverUrl) {
     const wrap = el('div', { html: FALLBACK_COVER(book) });
@@ -23,14 +28,17 @@ export function bookThumb(book, { lazy = true } = {}) {
   }
   const img = el('img', {
     alt: `Cover of ${book.title || 'book'}`,
-    loading: lazy ? 'lazy' : 'eager',
+    loading: 'lazy',
     decoding: 'async',
-    src: book.coverUrl,
+    class: lazy ? 'js-lazy' : '',
+    ...(lazy ? { 'data-src': book.coverUrl } : { src: book.coverUrl }),
   });
   img.addEventListener('error', () => {
+    img.classList.add('is-loaded');
     const wrap = el('div', { html: FALLBACK_COVER(book) });
     img.replaceWith(wrap.firstElementChild);
   });
+  if (!lazy) img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
   return img;
 }
 
@@ -39,17 +47,23 @@ export function bookThumb(book, { lazy = true } = {}) {
  * @param {object} opts
  * @param {boolean} opts.liked
  * @param {boolean} opts.unlocked
+ * @param {number}  opts.index          position in the grid, drives the stagger
  * @param {(book, btn) => void} opts.onLike
- * @param {(book) => void} opts.onComment
+ * @param {(book) => void} opts.onComment      open the full comments panel
+ * @param {(book, text) => Promise<void>} opts.onQuickComment
  * @param {(book) => void} opts.onShare
  */
-export function renderBookCard(book, { liked = false, unlocked = false, onLike, onComment, onShare } = {}) {
+export function renderBookCard(book, {
+  liked = false, unlocked = false, index = 0,
+  onLike, onComment, onQuickComment, onShare,
+} = {}) {
   const rating = book.ratingAvg || 0;
   const format = (book.format || 'pdf').toLowerCase();
   const locked = book.isPremium && !unlocked;
   const comments = book.commentCount || 0;
 
   const card = el('article', { class: 'card', dataset: { id: book.id } });
+  card.style.setProperty('--i', String(index % 24));
 
   /* ---- cover ---- */
   const thumb = el('a', {
@@ -73,7 +87,8 @@ export function renderBookCard(book, { liked = false, unlocked = false, onLike, 
 
   /* ---- hover overlay ---- */
   const overlay = el('div', { class: 'card__overlay' });
-  if (book.description) overlay.append(el('p', { text: book.description }));
+  const desc = book.description ? el('p', { text: book.description }) : null;
+  if (desc) overlay.append(desc);
 
   const actions = el('div', { class: 'card__overlay-actions card__overlay-actions--stacked' });
 
@@ -90,9 +105,9 @@ export function renderBookCard(book, { liked = false, unlocked = false, onLike, 
   }, [el('span', { html: liked ? icon('heartF') : icon('heart') }), el('span', { class: 'js-like-count', text: formatCount(book.likes || 0) })]);
   likeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onLike?.(book, likeBtn); });
 
-  const commentBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Comments' },
+  const commentBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Write a comment' },
     [el('span', { html: icon('comment') }), el('span', { class: 'js-comment-count', text: formatCount(comments) })]);
-  commentBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onComment?.(book); });
+  commentBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showQuick(); });
 
   const shareBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Share' },
     [el('span', { html: icon('share') })]);
@@ -101,6 +116,66 @@ export function renderBookCard(book, { liked = false, unlocked = false, onLike, 
   row.append(likeBtn, commentBtn, shareBtn);
   actions.append(readBtn, row);
   overlay.append(actions);
+
+  /* ---- quick comment: write a review without leaving the grid ---- */
+  const quick = el('div', { class: 'card__quickcomment hidden' });
+  const qInput = el('textarea', {
+    rows: '3', placeholder: 'Write a comment...',
+    'aria-label': `Write a comment on ${book.title}`,
+  });
+  const qRow = el('div', { class: 'overlay-row' });
+
+  const qPost = el('button', { class: 'overlay-btn overlay-btn--primary', type: 'button' },
+    [el('span', { html: icon('check') }), el('span', { text: 'Post' })]);
+  const qCancel = el('button', { class: 'overlay-btn', type: 'button', text: 'Cancel' });
+  const qViewAll = el('button', { class: 'overlay-btn', type: 'button', title: 'Read all comments' },
+    [el('span', { html: icon('list') }), el('span', { text: 'View' })]);
+
+  qRow.append(qPost, qViewAll, qCancel);
+  quick.append(qInput, qRow);
+  overlay.append(quick);
+
+  function showQuick() {
+    actions.classList.add('hidden');
+    if (desc) desc.classList.add('hidden');
+    quick.classList.remove('hidden');
+    setTimeout(() => qInput.focus(), 30);
+  }
+  function hideQuick() {
+    quick.classList.add('hidden');
+    actions.classList.remove('hidden');
+    if (desc) desc.classList.remove('hidden');
+  }
+  function bumpCount(n) {
+    card.querySelectorAll('.js-comment-count').forEach((node) => { node.textContent = formatCount(n); });
+  }
+
+  qCancel.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); qInput.value = ''; hideQuick(); });
+  qViewAll.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); hideQuick(); onComment?.(book); });
+  qPost.addEventListener('click', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const text = qInput.value.trim();
+    if (!text) { qInput.focus(); return; }
+    qPost.disabled = true;
+    try {
+      await onQuickComment?.(book, text);
+      qInput.value = '';
+      hideQuick();
+      const next = Number(card.dataset.comments || comments) + 1;
+      card.dataset.comments = String(next);
+      bumpCount(next);
+    } catch (err) {
+      console.error(err); // the parent surfaces the reason
+    } finally {
+      qPost.disabled = false;
+    }
+  });
+  qInput.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') qPost.click();
+  });
+  qInput.addEventListener('click', (e) => e.stopPropagation());
+
   thumb.append(overlay);
   card.append(thumb);
 
@@ -122,7 +197,7 @@ export function renderBookCard(book, { liked = false, unlocked = false, onLike, 
 
   const footerComment = el('button', {
     class: 'card__comment', type: 'button',
-    title: comments ? `${comments} comment${comments === 1 ? '' : 's'}` : 'Be the first to comment',
+    title: comments ? `Read ${comments} comment${comments === 1 ? '' : 's'}` : 'Be the first to comment',
     html: `${icon('comment')}<span class="js-comment-count">${formatCount(comments)}</span>`,
   });
   footerComment.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onComment?.(book); });

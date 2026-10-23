@@ -10,16 +10,18 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 
 | Feature | Where |
 |---|---|
-| YouTube-style responsive book grid with thumbnails, badges and hover overlay | `index.html`, `assets/js/cards.js` |
-| Search, category chips, five sort orders, infinite scroll | `assets/js/app.js` |
+| Video-style responsive grid: fixed column counts per breakpoint, staggered entrance, hover overlay | `index.html`, `assets/js/cards.js` |
+| Search, category chips, five sort orders, scroll loading with skeletons and a spinner | `assets/js/app.js` |
 | 5-star rating (one vote per reader, aggregate kept in a transaction) | `assets/js/data.js` |
-| Comments everywhere: a count + button on every card, an always-visible review panel on the book page, and a slide-over drawer from the reader | `assets/js/comments.js` |
+| Comments everywhere: write one straight from a grid card, an always-visible review panel on the book page, and a slide-over drawer from the reader | `assets/js/comments.js`, `assets/js/cards.js` |
 | Like button + share (Web Share API with clipboard fallback) | `assets/js/cards.js`, `assets/js/ui.js` |
 | Online reader — **EPUB** (epub.js), **PDF** (pdf.js), plus a text fallback | `assets/js/reader.js` |
 | Freemium gating: free preview pages, unlock modal, paywall at the limit | `assets/js/book.js` |
 | Auth: Google + email/password, password reset, persistent session | `assets/js/ui.js` |
 | My Library: continue reading, liked, unlocked | `library.html` |
 | Zoho-style design language: #E42527 accent, top bar + left nav rail, flat panels on a grey canvas | `assets/css/styles.css`, `assets/js/ui.js` |
+| Motion: content slides in on every route change, cards rise in staggered | `assets/css/styles.css`, `assets/js/ui.js` |
+| Lazy cover loading via IntersectionObserver, with fade-in | `assets/js/util.js`, `assets/js/cards.js` |
 | Light / dark theme, offline-first Firestore cache | `assets/css/styles.css`, `assets/js/firebase.js` |
 | Security rules for Firestore and Storage | `firestore.rules`, `storage.rules` |
 | Sample catalogue seeder (Admin SDK) | `seed/` |
@@ -40,6 +42,26 @@ for free/unlocked, blue `#226DB4` for EPUB, yellow `#F9B21D` for premium.
 
 All of it lives in design tokens at the top of `assets/css/styles.css`, so
 re-theming is a matter of editing that one block.
+
+## Motion, loading and commenting
+
+- **Slide-in transitions.** `renderShell()` calls `enterView()`, which replays a
+  `slideInRight` animation on the content pane on every page load. In the
+  single-file preview the same animation replays on each hash-route change.
+- **Staggered cards.** Each card carries `--i`, its index in the batch, and
+  `slideInUp` is delayed by `calc(var(--i) * 28ms)`. The animation uses
+  `fill-mode: backwards` so the hover lift still works once it finishes.
+- **Lazy covers.** `bookThumb()` ships `data-src` and `activateLazyImages()`
+  swaps in the real `src` 400px before the image enters the viewport, then
+  fades it in. A failed load falls back to the generated gradient cover.
+- **Scroll loading.** An `IntersectionObserver` on `#loadSentinel` pulls the
+  next page in ~700px early. The grid shows skeleton cards on first load and a
+  spinner while paging, then either a "Load more" button or an end-of-list note.
+- **Quick comment.** The comment button on any card opens an inline textarea in
+  the overlay — type and post without leaving the grid. The card's footer
+  comment count opens the full thread instead. `Cmd/Ctrl + Enter` posts.
+- **Reduced motion.** Everything above collapses to instant when the OS asks
+  for `prefers-reduced-motion: reduce`.
 
 ---
 

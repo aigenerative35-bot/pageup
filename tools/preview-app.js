@@ -33,7 +33,18 @@
   var sort = 'trending';
   var category = 'all';
   var search = '';
+  var visible = 8;            // scroll-loading: how many books are rendered
+  var PAGE = 4;               // how many more arrive per scroll
   var VIEW = document.getElementById('view');
+
+  /** Replay the slide-in transition on the content pane. */
+  function enterView() {
+    var main = document.querySelector('main');
+    if (!main) return;
+    main.classList.remove('view-enter');
+    void main.offsetWidth;
+    main.classList.add('view-enter');
+  }
 
   /* ------------------------------------------------------- demo helpers -- */
   function bookById(id) {
@@ -183,12 +194,13 @@
     var clear = document.getElementById('searchClear');
     var run = debounce(function () {
       search = input.value.trim();
+      visible = 8;
       clear.classList.toggle('hidden', !input.value);
       if (route().name === 'home') paintGrid(); else location.hash = '#/';
     }, 260);
     input.addEventListener('input', run);
     clear.addEventListener('click', function () {
-      input.value = ''; search = ''; clear.classList.add('hidden'); input.focus();
+      input.value = ''; search = ''; visible = 8; clear.classList.add('hidden'); input.focus();
       if (route().name === 'home') paintGrid(); else location.hash = '#/';
     });
     document.getElementById('searchForm').addEventListener('submit', function (e) { e.preventDefault(); run(); });
@@ -278,7 +290,7 @@
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>' +
             '<span>Catalogue</span></div>' +
           '<h1>Discover books</h1>' +
-          '<p id="resultMeta">Every premium title opens with a free preview — no card, no signup wall.</p>' +
+          '<p>Every premium title opens with a free preview — no card, no signup wall.</p>' +
         '</div>' +
         '<div class="row gap-12">' +
           '<label class="sr-only" for="sortSelect">Sort books</label>' +
@@ -310,8 +322,12 @@
         '<div class="filterbar">' +
           '<span class="hint" style="font-weight:600;color:var(--text-2)">Category</span>' +
           '<div class="chipbar" id="chipbar" role="group" aria-label="Filter by category"></div>' +
+          '<span class="spacer"></span>' +
+          '<span class="hint" id="resultMeta"></span>' +
         '</div>' +
         '<div class="grid" id="bookGrid"></div>' +
+        '<div id="loadStatus" class="hidden"></div>' +
+        '<div id="loadSentinel" style="height:1px"></div>' +
       '</section>' +
 
       '<section style="padding:8px 0 36px">' +
@@ -334,7 +350,7 @@
 
     var sel = document.getElementById('sortSelect');
     sel.value = sort;
-    sel.addEventListener('change', function (e) { sort = e.target.value; paintChips(); paintGrid(); paintSidebar(); });
+    sel.addEventListener('change', function (e) { sort = e.target.value; visible = 8; paintChips(); paintGrid(); paintSidebar(); });
     paintChips();
     paintGrid();
   }
@@ -346,10 +362,12 @@
     var list = [{ name: 'all', label: 'All books' }].concat(categories().map(function (c) { return { name: c, label: c }; }));
     list.forEach(function (c) {
       var btn = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(category === c.name), text: c.label });
-      btn.addEventListener('click', function () { category = c.name; paintChips(); paintGrid(); paintSidebar(); });
+      btn.addEventListener('click', function () { category = c.name; visible = 8; paintChips(); paintGrid(); paintSidebar(); });
       host.append(btn);
     });
   }
+
+  var gridObserver = null;
 
   function paintGrid() {
     var grid = document.getElementById('bookGrid');
@@ -363,19 +381,89 @@
       if (search) bits.push('for \u201C' + search + '\u201D');
       if (category !== 'all') bits.push('in ' + category);
       meta.textContent = bits.join(' ');
+      meta.style.whiteSpace = 'nowrap';
     }
 
     if (!items.length) {
       grid.append(el('div', { class: 'empty', html: icon('search') +
         '<h3>No books matched</h3><p>Try a different search term or clear the category filter.</p>' }));
+      paintLoadStatus(0);
       return;
     }
-    items.forEach(function (book) {
-      grid.append(renderBookCard(book, {
-        liked: book.liked, unlocked: book.unlocked,
-        onLike: onLike, onComment: function (b) { openCommentsDrawer(b); }, onShare: onShare
+
+    appendPage(items.slice(0, visible), 0);
+    paintLoadStatus(items.length);
+
+    /* Scroll loading: pull in the next batch as the sentinel approaches. */
+    var sentinel = document.getElementById('loadSentinel');
+    if (sentinel && 'IntersectionObserver' in window) {
+      if (gridObserver) gridObserver.disconnect();
+      gridObserver = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        var shown = grid.querySelectorAll('.card').length;
+        var all = catalogue();
+        if (shown >= all.length) { paintLoadStatus(all.length); return; }
+        paintLoadStatus(all.length, true);
+        setTimeout(function () {
+          appendPage(all.slice(shown, shown + PAGE), shown);
+          paintLoadStatus(all.length);
+        }, 420);
+      }, { rootMargin: '500px 0px' });
+      gridObserver.observe(sentinel);
+    }
+  }
+
+  function appendPage(items, offset) {
+    var grid = document.getElementById('bookGrid');
+    var frag = document.createDocumentFragment();
+    items.forEach(function (book, i) {
+      frag.append(renderBookCard(book, {
+        liked: book.liked, unlocked: book.unlocked, index: i,
+        onLike: onLike,
+        onComment: function (b) { openCommentsDrawer(b); },
+        onQuickComment: quickComment,
+        onShare: onShare
       }));
     });
+    grid.append(frag);
+    activateLazyImages(grid);
+  }
+
+  function paintLoadStatus(total, loading) {
+    var host = document.getElementById('loadStatus');
+    if (!host) return;
+    host.innerHTML = '';
+    var shown = document.querySelectorAll('#bookGrid .card').length;
+    if (loading) {
+      host.classList.remove('hidden');
+      host.append(loadMoreIndicator('Loading more books...'));
+    } else if (shown < total) {
+      host.classList.remove('hidden');
+      var btn = el('button', { class: 'btn btn--ghost' }, [
+        el('span', { html: icon('book') }), el('span', { text: 'Load more books' })
+      ]);
+      btn.addEventListener('click', function () {
+        paintLoadStatus(total, true);
+        setTimeout(function () { appendPage(catalogue().slice(shown, shown + PAGE), shown); paintLoadStatus(total); }, 380);
+      });
+      host.append(btn);
+    } else {
+      host.classList.remove('hidden');
+      host.append(el('div', { class: 'load-more--done', text: 'You have reached the end \u00b7 ' + total + ' books' }));
+    }
+  }
+
+  /** Quick comment straight from a grid card. */
+  function quickComment(book, text) {
+    var list = state.comments[book.id] || (state.comments[book.id] = []);
+    list.unshift({
+      id: 'c-' + Date.now(), name: 'Guest reader', text: String(text).slice(0, 2000),
+      likes: 0, createdAt: new Date().toISOString()
+    });
+    save();
+    refreshComments(book.id);
+    toast('Comment posted', 'success');
+    return Promise.resolve();
   }
 
   /* ------------------------------------------------------------- detail -- */
@@ -991,6 +1079,7 @@
     });
     if (params.cat) category = params.cat;
     if (params.sort) sort = params.sort;
+    visible = 8;
     return { name: 'home' };
   }
 
@@ -1004,6 +1093,7 @@
     else if (r.name === 'library') { renderLibrary(r.panel); window.scrollTo(0, 0); }
     else { document.title = 'PageUp \u2014 Read unlimited. Pay only for what you love.'; renderHome(); }
     paintSidebar();
+    enterView();
   }
 
   /* ------------------------------------------------------------ library -- */
@@ -1068,11 +1158,14 @@
           '<a class="btn btn--primary mt-16" href="#/">Browse the catalogue</a>' }));
         return;
       }
-      rows.forEach(function (row) {
+      rows.forEach(function (row, idx) {
         var b = p === 'continue' ? row.book : row;
         var card = renderBookCard(b, {
-          liked: b.liked, unlocked: true,
-          onLike: onLike, onComment: function (x) { openCommentsDrawer(x); }, onShare: onShare
+          liked: b.liked, unlocked: true, index: idx,
+          onLike: onLike,
+          onComment: function (x) { openCommentsDrawer(x); },
+          onQuickComment: quickComment,
+          onShare: onShare
         });
         if (p === 'continue') {
           var total = b.pages || 100;
