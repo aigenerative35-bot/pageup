@@ -119,6 +119,39 @@ devices, and no money moves. Everything below is the real thing.
 
 ---
 
+## Try it in 30 seconds
+
+Two ways, pick one.
+
+**A. On the live site — nothing to install.** Both pages are already deployed
+and already on the same origin, so they share data:
+
+- Website — <https://aigenerative35-bot.github.io/pageup/>
+- Admin — <https://aigenerative35-bot.github.io/pageup/admin.html>
+
+Open the admin, publish a book, then open the website in another tab. It is
+there. (This runs in preview mode, so the book is saved in your browser only.)
+
+**B. On your own machine.** Unzip the download and run the launcher:
+
+```bash
+./serve.sh          # macOS / Linux      -> http://localhost:5173
+serve.bat           # Windows
+```
+
+It picks Python or Node, whichever you have, and prints both URLs.
+
+> **Do not just double-click `index.html`.** Two reasons: the pages are ES
+> modules, which browsers refuse to load over `file://`, and the admin console
+> shares data with the site through `localStorage`, which is scoped to an
+> origin. Served from `file://` the two pages are different origins and will
+> not see each other. Always open both from the same `http://localhost:PORT`
+> the launcher prints.
+
+Then: **admin → publish a book → website tab → refresh → it is there.**
+
+---
+
 ## The admin console
 
 `admin.html` is a separate page that manages **the same catalogue the public
@@ -401,6 +434,7 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 ├── book.html               # detail page + reader overlay
 ├── library.html            # continue reading / liked / unlocked
 ├── admin.html              # admin console (staff-gated)
+├── serve.sh / serve.bat    # one-command local server for testing
 ├── preview.html            # generated: single-file offline preview
 ├── 404.html
 ├── tools/
