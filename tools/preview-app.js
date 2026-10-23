@@ -118,6 +118,15 @@
     return items.sort(function (a, b) { return key(b) - key(a); });
   }
 
+  function featuredBooks(limit) {
+    var flagged = DEMO_BOOKS.filter(function (b) { return b.featured; }).map(function (b) { return view(b.id); });
+    var pool = flagged.length >= 3
+      ? flagged
+      : DEMO_BOOKS.map(function (b) { return view(b.id); })
+          .sort(function (a, b) { return (b.trendScore || 0) - (a.trendScore || 0); });
+    return pool.slice(0, limit || 7);
+  }
+
   function categories() {
     var seen = {};
     DEMO_BOOKS.forEach(function (b) { seen[b.category] = (seen[b.category] || 0) + 1; });
@@ -302,21 +311,14 @@
         '</div>' +
       '</div>' +
 
-      '<section class="hero">' +
-        '<span class="hero__eyebrow">Freemium reading, built for India</span>' +
-        '<h1>Read unlimited previews. Pay only for the books you love.</h1>' +
-        '<p>Start any book free. When a story grabs you, unlock it once and keep it for life — on every device, in EPUB and PDF.</p>' +
-        '<div class="hero__actions">' +
-          '<a class="btn btn--primary btn--lg" href="#catalogue">' + icon('grid') + '<span>Browse the library</span></a>' +
-          '<a class="btn btn--outline btn--lg" href="#/book/demo-meditations">' + icon('play') + '<span>Start reading free</span></a>' +
-        '</div>' +
-        '<div class="hero__stats">' +
-          '<div class="hero__stat"><b>' + DEMO_BOOKS.length + '</b><span>Titles in catalogue</span></div>' +
-          '<div class="hero__stat"><b>' + compact(reads) + '</b><span>Reads on PageUp</span></div>' +
-          '<div class="hero__stat"><b>' + DEMO_BOOKS.filter(function (b) { return !b.isPremium; }).length + '</b><span>Free to read now</span></div>' +
-          '<div class="hero__stat"><b>' + comments + '</b><span>Reader comments</span></div>' +
-        '</div>' +
-      '</section>' +
+      '<div id="launchBanner"></div>' +
+
+      '<div class="stat-strip">' +
+        '<div><b>' + DEMO_BOOKS.length + '</b><span>Titles in catalogue</span></div>' +
+        '<div><b>' + compact(reads) + '</b><span>Reads on PageUp</span></div>' +
+        '<div><b>' + DEMO_BOOKS.filter(function (b) { return !b.isPremium; }).length + '</b><span>Free to read now</span></div>' +
+        '<div><b>' + comments + '</b><span>Reader comments</span></div>' +
+      '</div>' +
 
       '<section id="catalogue">' +
         '<div class="filterbar">' +
@@ -353,7 +355,18 @@
     sel.addEventListener('change', function (e) { sort = e.target.value; visible = 8; paintChips(); paintGrid(); paintSidebar(); });
     paintChips();
     paintGrid();
+
+    var bannerHost = document.getElementById('launchBanner');
+    if (bannerHost) {
+      if (banner) banner.destroy();
+      banner = createBanner(bannerHost, featuredBooks(7), {
+        onShare: onShare,
+        hrefFor: function (b) { return '#/book/' + b.id; }
+      });
+    }
   }
+
+  var banner = null;
 
   function paintChips() {
     var host = document.getElementById('chipbar');
@@ -1088,6 +1101,7 @@
     closeModal();
     closeDrawer();
     if (reader) reader.close();
+    if (banner) { banner.destroy(); banner = null; }
     commentsViews = [];
     if (r.name === 'detail') { renderDetail(r.id); window.scrollTo(0, 0); }
     else if (r.name === 'library') { renderLibrary(r.panel); window.scrollTo(0, 0); }

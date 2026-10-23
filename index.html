@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>PageUp — Read unlimited. Pay only for what you love.</title>
   <meta name="description" content="PageUp is a freemium online reading platform. Browse thousands of books, read free previews instantly, and unlock the ones you love — no subscription required.">
-  <meta name="theme-color" content="#e42527">
+  <meta name="theme-color" content="#226db4">
   <meta property="og:type" content="website">
   <meta property="og:title" content="PageUp — Online reading, freemium done right">
   <meta property="og:description" content="Read free previews of every book. Unlock the ones you love, forever.">
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/styles.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%23e42527'/><path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%23226db4'/><path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>">
 </head>
 <body>
   <div id="appHeader"></div>
@@ -42,25 +42,14 @@
       </div>
     </div>
 
-    <section class="hero">
-      <span class="hero__eyebrow">Freemium reading, built for India</span>
-      <h1>Read unlimited previews. Pay only for the books you love.</h1>
-      <p>Start any book free. When a story grabs you, unlock it once and keep it for life — on every device, in EPUB and PDF.</p>
-      <div class="hero__actions">
-        <a class="btn btn--primary btn--lg" href="#catalogue">
-          <span id="heroBrowseIcon"></span><span>Browse the library</span>
-        </a>
-        <a class="btn btn--outline btn--lg" href="./book.html?id=demo-meditations">
-          <span id="heroPlayIcon"></span><span>Start reading free</span>
-        </a>
-      </div>
-      <div class="hero__stats">
-        <div class="hero__stat"><b id="statBooks">—</b><span>Titles in catalogue</span></div>
-        <div class="hero__stat"><b id="statReaders">—</b><span>Reads on PageUp</span></div>
-        <div class="hero__stat"><b id="statFree">—</b><span>Free to read now</span></div>
-        <div class="hero__stat"><b id="statComments">—</b><span>Reader comments</span></div>
-      </div>
-    </section>
+    <div id="launchBanner"></div>
+
+    <div class="stat-strip">
+      <div><b id="statBooks">—</b><span>Titles in catalogue</span></div>
+      <div><b id="statReaders">—</b><span>Reads on PageUp</span></div>
+      <div><b id="statFree">—</b><span>Free to read now</span></div>
+      <div><b id="statComments">—</b><span>Reader comments</span></div>
+    </div>
 
     <section id="catalogue">
       <div class="filterbar">
@@ -145,11 +134,6 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
     document.querySelectorAll('[data-noop]').forEach((a) => a.addEventListener('click', (e) => e.preventDefault()));
-  </script>
-  <script type="module">
-    import { icon } from './assets/js/util.js';
-    document.getElementById('heroBrowseIcon').innerHTML = icon('grid');
-    document.getElementById('heroPlayIcon').innerHTML = icon('play');
   </script>
 </body>
 </html>

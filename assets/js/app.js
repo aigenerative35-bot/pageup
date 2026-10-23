@@ -6,6 +6,7 @@ import {
 import { openCommentsDrawer } from './comments.js';
 import * as store from './store.js';
 import { renderBookCard, skeletonCard } from './cards.js';
+import { createBanner } from './banner.js';
 import { debounce, activateLazyImages, loadMoreIndicator } from './util.js';
 
 const state = {
@@ -39,8 +40,24 @@ async function boot() {
   const searchInput = $('#searchInput');
   if (searchInput) searchInput.addEventListener('input', () => runSearch(searchInput.value.trim()));
 
+  await mountBanner();
   await load(true);
   await loadStats();
+}
+
+/* ---------------------------------------------------------- Launch banner */
+let banner = null;
+async function mountBanner() {
+  const host = $('#launchBanner');
+  if (!host) return;
+  try {
+    const slides = await store.listFeatured(7);
+    if (banner) banner.destroy();
+    banner = createBanner(host, slides, { onShare: shareBook });
+  } catch (err) {
+    console.error('banner failed', err);
+    host.remove();
+  }
 }
 
 /* ------------------------------------------------------------- Controls */

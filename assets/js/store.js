@@ -110,6 +110,24 @@ export function registerView(id) {
   save();
 }
 
+export async function listFeatured(limitCount = 7) {
+  if (!DEMO) return data.listFeatured(limitCount);
+  const merged = DEMO_BOOKS.map((b) => {
+    const local = state.books[b.id] || {};
+    return {
+      ...b, ...local,
+      likes: (b.likes || 0) + (local.likesDelta || 0),
+      commentCount: demoCommentCount(b.id),
+      ...aggFrom(b.id, b),
+    };
+  });
+  const flagged = merged.filter((b) => b.featured);
+  const pool = flagged.length >= 3
+    ? flagged
+    : merged.slice().sort((a, b) => (b.trendScore || 0) - (a.trendScore || 0));
+  return pool.slice(0, limitCount);
+}
+
 export async function getCategories() {
   if (!DEMO) return data.getCategories();
   const counts = new Map();

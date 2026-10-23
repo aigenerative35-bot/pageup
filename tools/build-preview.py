@@ -39,6 +39,7 @@ styles = read(os.path.join(SRC, "assets/css/styles.css"))
 util_js = strip_module_syntax(read(os.path.join(SRC, "assets/js/util.js")))
 demo_js = strip_module_syntax(read(os.path.join(SRC, "assets/js/demo-data.js")))
 cards_js = strip_module_syntax(read(os.path.join(SRC, "assets/js/cards.js")))
+banner_js = strip_module_syntax(read(os.path.join(SRC, "assets/js/banner.js")))
 app_js = read(os.path.join(WORK, "preview-app.js"))
 
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>"
@@ -66,7 +67,7 @@ HTML = f"""<!DOCTYPE html>
 .pv-bar {{
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 9px 24px; font-size: 12.5px; font-weight: 600;
-  background: linear-gradient(90deg, #a8181a, #e42527 62%, #f0473c);
+  background: linear-gradient(90deg, #0f3355, #226db4 62%, #3d8fd1);
   color: #fff;
 }}
 .pv-bar svg {{ width: 15px; height: 15px; flex: 0 0 auto; }}
@@ -162,6 +163,9 @@ HTML = f"""<!DOCTYPE html>
 /* -------------------------------------------------------- cards.js ------ */
 {cards_js}
 
+/* ------------------------------------------------------- banner.js ------ */
+{banner_js}
+
 /* --------------------------------------------------------- controller --- */
 {app_js}
 
@@ -196,4 +200,5 @@ print(f"  styles : {len(styles):,} bytes")
 print(f"  util   : {len(util_js):,} bytes")
 print(f"  demo   : {len(demo_js):,} bytes")
 print(f"  cards  : {len(cards_js):,} bytes")
+print(f"  banner : {len(banner_js):,} bytes")
 print(f"  app    : {len(app_js):,} bytes")

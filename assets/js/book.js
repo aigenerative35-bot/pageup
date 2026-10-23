@@ -375,7 +375,7 @@ function startCheckout(book) {
     script.onload = () => {
       const rzp = new window.Razorpay({
         key: siteConfig.razorpayKeyId, amount: price, currency: siteConfig.currency,
-        name: siteConfig.name, description: book.title, theme: { color: '#e42527' },
+        name: siteConfig.name, description: book.title, theme: { color: '#226db4' },
         handler: () => resolve(true),
         modal: { ondismiss: () => resolve(false) },
       });

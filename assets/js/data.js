@@ -69,6 +69,23 @@ export function registerView(id) {
   updateDoc(bookDoc(id), { views: increment(1) }).catch(() => {});
 }
 
+/**
+ * Slides for the launch banner: books flagged `featured`, newest first.
+ * Falls back to the newest titles when nothing is flagged, so the banner is
+ * never empty on a fresh install.
+ */
+export async function listFeatured(limitCount = 7) {
+  try {
+    const snap = await getDocs(query(booksCol(), where('featured', '==', true), fbLimit(limitCount)));
+    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    if (items.length >= 3) return items.sort((a, b) => (b.trendScore || 0) - (a.trendScore || 0));
+  } catch (err) {
+    console.warn('featured query failed, falling back to newest', err);
+  }
+  const { items } = await listBooks({ sort: 'newest', pageSize: limitCount });
+  return items;
+}
+
 export async function getCategories() {
   const snap = await getDocs(query(booksCol(), orderBy('trendScore', 'desc'), fbLimit(200)));
   const set = new Map();

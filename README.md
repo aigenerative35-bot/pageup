@@ -19,7 +19,8 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 | Freemium gating: free preview pages, unlock modal, paywall at the limit | `assets/js/book.js` |
 | Auth: Google + email/password, password reset, persistent session | `assets/js/ui.js` |
 | My Library: continue reading, liked, unlocked | `library.html` |
-| Zoho-style design language: #E42527 accent, top bar + left nav rail, flat panels on a grey canvas | `assets/css/styles.css`, `assets/js/ui.js` |
+| Ad-style launch banner: 7 slides, auto-advance, arrows, dots, swipe, keyboard | `assets/js/banner.js` |
+| Zoho-style design language in blue & white: #226DB4 accent, top bar + left nav rail, flat white panels | `assets/css/styles.css`, `assets/js/ui.js` |
 | Motion: content slides in on every route change, cards rise in staggered | `assets/css/styles.css`, `assets/js/ui.js` |
 | Lazy cover loading via IntersectionObserver, with fade-in | `assets/js/util.js`, `assets/js/cards.js` |
 | Light / dark theme, offline-first Firestore cache | `assets/css/styles.css`, `assets/js/firebase.js` |
@@ -34,14 +35,40 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 
 ## Design language
 
-The UI follows Zoho's visual system: the brand red `#E42527` as the accent, a
-fixed top bar with a left navigation rail, flat white panels on a light grey
-canvas, 6-8px corner radii, hairline `#e4e6e8` borders, and an 8pt spacing
-grid. Zoho's secondary brand colours are used for meaning — green `#089949`
-for free/unlocked, blue `#226DB4` for EPUB, yellow `#F9B21D` for premium.
+Zoho's layout system in a **blue and white** palette: `#226DB4` as the accent,
+a fixed top bar with a left navigation rail, flat white panels on a cool grey
+canvas (`#f5f7fa`), 6-8px corner radii, hairline `#e1e6ec` borders and an 8pt
+spacing grid. Deep navy `#0f3355` marks premium, and generated book covers are
+constrained to the blue family so a full shelf still reads as one palette.
+
+Two accents sit outside the blue: rating stars (`--star`, blue by default —
+flip it to `#f0a500` for the conventional amber) and `--danger` red for errors
+and destructive actions only.
 
 All of it lives in design tokens at the top of `assets/css/styles.css`, so
 re-theming is a matter of editing that one block.
+
+## The launch banner
+
+`assets/js/banner.js` renders up to 7 slides of featured titles as an
+ad-style carousel above the catalogue:
+
+- slides sit in a flex track moved by `transform`, so the transition is
+  GPU-composited
+- auto-advance every 6s with a progress bar, **paused on hover, focus and
+  when the tab is hidden**
+- prev/next arrows, clickable dots, a slide counter, swipe (pointer events)
+  and ArrowLeft/ArrowRight when focused
+- off-screen slides are `aria-hidden` and removed from the tab order
+- disabled entirely under `prefers-reduced-motion`
+
+Slides come from `store.listFeatured(7)`: books flagged `featured: true`,
+falling back to the newest titles so the banner is never empty on a fresh
+install. Flag a book in the console or the seeder with:
+
+```jsonc
+{ "featured": true }
+```
 
 ## Motion, loading and commenting
 
@@ -266,6 +293,7 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 │       ├── ui.js                # shell (top bar + sidebar), theme, auth, share
 │       ├── comments.js          # shared composer, list, drawer
 │       ├── cards.js             # book card component
+│       ├── banner.js            # launch-banner carousel
 │       ├── reader.js            # pdf.js + epub.js + text engine
 │       ├── app.js               # home page controller
 │       ├── book.js              # detail page controller

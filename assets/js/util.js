@@ -70,11 +70,17 @@ export function uid(prefix = 'id') {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
 }
 
-/** Deterministic gradient for cover fallbacks. */
+/** Deterministic gradient for cover fallbacks.
+ *  Kept inside the blue family so a shelf of generated covers still reads as
+ *  one palette; the seed only varies the depth, not the hue family. */
 export function coverGradient(seed = '') {
   let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 360;
-  return `linear-gradient(140deg, hsl(${h} 62% 42%), hsl(${(h + 48) % 360} 68% 28%))`;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 997;
+  const hue = 196 + (h % 50);           // 196..245 — all blue
+  const topL = 34 + (h % 6) * 3;        // 34..49
+  const botL = 17 + ((h >> 3) % 5) * 3; // 17..29
+  const sat = 52 + ((h >> 5) % 4) * 6;  // 52..70
+  return `linear-gradient(142deg, hsl(${hue} ${sat}% ${topL}%), hsl(${hue + 6} ${sat + 4}% ${botL}%))`;
 }
 
 /* ------------------------------ Toasts ---------------------------------- */
