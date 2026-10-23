@@ -65,14 +65,25 @@ function wireControls() {
   const sel = $('#sortSelect');
   if (sel) { sel.value = state.sort; sel.addEventListener('change', (e) => { state.sort = e.target.value; load(true); }); }
 
-  /* Scroll loading: pull the next page in before the reader reaches the end. */
+  observeSentinel();
+}
+
+/* Auto-scrolling grid.
+   An IntersectionObserver only fires when the intersection *state changes*,
+   so a load that leaves the sentinel still on screen would stall the feed.
+   Re-observing after every append forces a fresh check, which keeps pulling
+   pages until either the list is exhausted or the viewport is full. */
+let sentinelObserver = null;
+function observeSentinel() {
   const sentinel = $('#loadSentinel');
-  if (sentinel && 'IntersectionObserver' in window) {
-    new IntersectionObserver((entries) => {
+  if (!sentinel || !('IntersectionObserver' in window)) return;
+  if (!sentinelObserver) {
+    sentinelObserver = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && state.hasMore && !state.loading) load(false);
-    }, { rootMargin: '700px 0px' }).observe(sentinel);
+    }, { rootMargin: '900px 0px' });
   }
-  $('#loadMore')?.addEventListener('click', () => load(false));
+  sentinelObserver.unobserve(sentinel);
+  sentinelObserver.observe(sentinel);
 }
 
 function paintChips() {
@@ -145,6 +156,7 @@ async function load(reset) {
   } finally {
     state.loading = false;
     paintLoadStatus(state.hasMore ? 'idle' : 'done');
+    if (state.hasMore) observeSentinel();
   }
 }
 
@@ -166,26 +178,41 @@ function renderGrid(items, offset = 0) {
   activateLazyImages(grid);
 }
 
-/** The scroll-loading affordance under the grid. */
+/**
+ * The grid feeds itself as you scroll — there is no "load more" button to
+ * press. This only paints the transient states, plus a focus-revealed
+ * fallback so keyboard and screen-reader users are not locked out.
+ */
 function paintLoadStatus(mode) {
   const host = $('#loadStatus');
   if (!host) return;
   host.innerHTML = '';
+
   if (mode === 'loading') {
     host.classList.remove('hidden');
     host.append(loadMoreIndicator('Loading more books...'));
-  } else if (mode === 'idle') {
-    host.classList.toggle('hidden', !state.items.length);
-    if (!state.items.length) return;
-    const btn = el('button', { class: 'btn btn--ghost', id: 'loadMore' }, [
-      el('span', { html: icon('book') }), el('span', { text: 'Load more books' }),
-    ]);
-    btn.addEventListener('click', () => load(false));
-    host.append(btn);
-  } else {
-    host.classList.remove('hidden');
-    host.append(el('div', { class: 'load-more--done', text: `You have reached the end \u00b7 ${state.items.length} books` }));
+    return;
   }
+
+  if (mode === 'done' || !state.hasMore) {
+    if (!state.items.length) { host.classList.add('hidden'); return; }
+    host.classList.remove('hidden');
+    host.append(el('div', {
+      class: 'load-more--done',
+      text: `You have reached the end \u00b7 ${state.items.length} books`,
+    }));
+    return;
+  }
+
+  /* Idle with more to come: stay invisible. The sentinel observer fires long
+     before the reader arrives, so the next page is already there. */
+  host.classList.remove('hidden');
+  const fallback = el('button', {
+    class: 'btn btn--ghost sr-only-focusable', id: 'loadMore', type: 'button',
+    text: 'Load more books',
+  });
+  fallback.addEventListener('click', () => load(false));
+  host.append(fallback);
 }
 
 async function refreshLikes() {

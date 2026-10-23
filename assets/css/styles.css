@@ -887,7 +887,13 @@ img.js-lazy.is-loaded { opacity: 1; }
   border: 2px solid var(--border-strong); border-top-color: var(--accent);
   animation: spin .7s linear infinite;
 }
-.load-more--done { color: var(--text-3); font-size: 12.5px; padding-bottom: 40px; }
+.load-more--done { display: flex; justify-content: center; color: var(--text-3); font-size: 12.5px; padding: 4px 0 44px; }
+
+/* Keyboard-only fallback for infinite scroll: invisible until focused. */
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* Respect the OS "reduce motion" setting. */
 @media (prefers-reduced-motion: reduce) {

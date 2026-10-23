@@ -407,10 +407,17 @@
     appendPage(items.slice(0, visible), 0);
     paintLoadStatus(items.length);
 
-    /* Scroll loading: pull in the next batch as the sentinel approaches. */
+    observeSentinel();
+  }
+
+  /* Auto-scrolling grid. The observer only fires on a state change, so it is
+     re-armed after every append — otherwise a load that leaves the sentinel
+     on screen would stall the feed. */
+  function observeSentinel() {
     var sentinel = document.getElementById('loadSentinel');
-    if (sentinel && 'IntersectionObserver' in window) {
-      if (gridObserver) gridObserver.disconnect();
+    if (!sentinel || !('IntersectionObserver' in window)) return;
+    var grid = document.getElementById('bookGrid');
+    if (!gridObserver) {
       gridObserver = new IntersectionObserver(function (entries) {
         if (!entries[0].isIntersecting) return;
         var shown = grid.querySelectorAll('.card').length;
@@ -420,10 +427,12 @@
         setTimeout(function () {
           appendPage(all.slice(shown, shown + PAGE), shown);
           paintLoadStatus(all.length);
+          observeSentinel();
         }, 420);
-      }, { rootMargin: '500px 0px' });
-      gridObserver.observe(sentinel);
+      }, { rootMargin: '900px 0px' });
     }
+    gridObserver.unobserve(sentinel);
+    gridObserver.observe(sentinel);
   }
 
   function appendPage(items, offset) {
@@ -447,23 +456,33 @@
     if (!host) return;
     host.innerHTML = '';
     var shown = document.querySelectorAll('#bookGrid .card').length;
+
     if (loading) {
       host.classList.remove('hidden');
       host.append(loadMoreIndicator('Loading more books...'));
-    } else if (shown < total) {
-      host.classList.remove('hidden');
-      var btn = el('button', { class: 'btn btn--ghost' }, [
-        el('span', { html: icon('book') }), el('span', { text: 'Load more books' })
-      ]);
-      btn.addEventListener('click', function () {
-        paintLoadStatus(total, true);
-        setTimeout(function () { appendPage(catalogue().slice(shown, shown + PAGE), shown); paintLoadStatus(total); }, 380);
-      });
-      host.append(btn);
-    } else {
-      host.classList.remove('hidden');
-      host.append(el('div', { class: 'load-more--done', text: 'You have reached the end \u00b7 ' + total + ' books' }));
+      return;
     }
+
+    if (shown >= total) {
+      if (!shown) { host.classList.add('hidden'); return; }
+      host.classList.remove('hidden');
+      host.append(el('div', { class: 'load-more--done',
+        text: 'You have reached the end \u00b7 ' + total + ' books' }));
+      return;
+    }
+
+    /* More to come: the grid feeds itself on scroll, so stay invisible and
+       leave only a focus-revealed fallback for keyboard users. */
+    host.classList.remove('hidden');
+    var fallback = el('button', { class: 'btn btn--ghost sr-only-focusable', type: 'button', text: 'Load more books' });
+    fallback.addEventListener('click', function () {
+      paintLoadStatus(total, true);
+      setTimeout(function () {
+        appendPage(catalogue().slice(shown, shown + PAGE), shown);
+        paintLoadStatus(total);
+      }, 380);
+    });
+    host.append(fallback);
   }
 
   /** Quick comment straight from a grid card. */

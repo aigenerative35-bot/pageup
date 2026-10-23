@@ -11,7 +11,7 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 | Feature | Where |
 |---|---|
 | Video-style responsive grid: fixed column counts per breakpoint, staggered entrance, hover overlay | `index.html`, `assets/js/cards.js` |
-| Search, category chips, five sort orders, scroll loading with skeletons and a spinner | `assets/js/app.js` |
+| Search, category chips, five sort orders, pure auto-scroll loading (no button to press) | `assets/js/app.js` |
 | 5-star rating (one vote per reader, aggregate kept in a transaction) | `assets/js/data.js` |
 | Comments everywhere: write one straight from a grid card, an always-visible review panel on the book page, and a slide-over drawer from the reader | `assets/js/comments.js`, `assets/js/cards.js` |
 | Like button + share (Web Share API with clipboard fallback) | `assets/js/cards.js`, `assets/js/ui.js` |
@@ -81,9 +81,12 @@ install. Flag a book in the console or the seeder with:
 - **Lazy covers.** `bookThumb()` ships `data-src` and `activateLazyImages()`
   swaps in the real `src` 400px before the image enters the viewport, then
   fades it in. A failed load falls back to the generated gradient cover.
-- **Scroll loading.** An `IntersectionObserver` on `#loadSentinel` pulls the
-  next page in ~700px early. The grid shows skeleton cards on first load and a
-  spinner while paging, then either a "Load more" button or an end-of-list note.
+- **Auto-scrolling grid.** There is no "load more" button — an
+  `IntersectionObserver` on `#loadSentinel` pulls the next page in ~700px
+  before the reader arrives, so the next row is already there. Skeleton cards
+  cover the first load, a spinner covers paging, and a note marks the end. A
+  focus-revealed fallback button keeps keyboard and screen-reader users from
+  being locked out of an infinite list.
 - **Quick comment.** The comment button on any card opens an inline textarea in
   the overlay — type and post without leaving the grid. The card's footer
   comment count opens the full thread instead. `Cmd/Ctrl + Enter` posts.
@@ -112,6 +115,41 @@ python3 tools/build-preview.py     # writes preview.html
 
 It is a preview, not the product: there is no auth, nothing is shared between
 devices, and no money moves. Everything below is the real thing.
+
+---
+
+## Go live on GitHub Pages
+
+The site is plain HTML/CSS/ES modules, so Pages can host it directly — no
+build step, no Firebase project required to look at it. On a fresh clone:
+
+1. **Push the repo to GitHub** (or fork it).
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
+   `.github/workflows/pages.yml` is already in the repo; it stages the pages
+   and deploys them.
+3. Push to `main` (or run the workflow manually from the **Actions** tab).
+   The site appears at:
+
+   ```
+   https://<your-username>.github.io/<repo-name>/
+   ```
+
+   For this repo that is
+   <https://aigenerative35-bot.github.io/pageup/>.
+
+Everything works from a project subpath: all links are relative, `404.html` is
+fully self-contained so it survives being served from any depth, and
+`.nojekyll` stops Pages running the files through Jekyll.
+
+On Pages the site runs in **preview mode** against the bundled catalogue,
+because `firebase-config.js` still holds placeholders. Paste a real Firebase
+config and it becomes the live app — Firebase Auth additionally needs the
+Pages domain whitelisted under **Authentication → Settings → Authorized
+domains** (add `<your-username>.github.io`).
+
+> Both `pages.yml` and `deploy.yml` listen on pushes to `main`. The Firebase
+> one skips itself unless the `FIREBASE_SERVICE_ACCOUNT` secret is set, so you
+> can keep both and choose later.
 
 ---
 
