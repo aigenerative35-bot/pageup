@@ -23,8 +23,32 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 | Security rules for Firestore and Storage | `firestore.rules`, `storage.rules` |
 | Sample catalogue seeder (Admin SDK) | `seed/` |
 | CI: deploy to Firebase Hosting on push to `main` | `.github/workflows/deploy.yml` |
+| One-file interactive preview (no server, no Firebase) | `preview.html` |
 
 **Preview mode.** Until you paste a real Firebase config, the site runs entirely offline against the bundled public-domain catalogue in `assets/js/demo-data.js`. Every screen works — likes, ratings, comments and previews persist in `localStorage` — so you can review the product before touching Firebase.
+
+---
+
+## Look at it first: `preview.html`
+
+One self-contained file. Double-click it — no server, no build, no Firebase,
+no network. It inlines the real stylesheet, the real card component and the
+public-domain sample catalogue, then runs the whole UX against `localStorage`:
+
+- the grid with search, category chips, sort and the like/share buttons
+- the book detail page, including the premium gate and the unlock modal
+- the reader with page turning and the paywall at the end of the free sample
+- comments (post, like, delete), ratings, light/dark theme
+
+Good for reviewing the design, demoing to someone, or sanity-checking a change.
+Rebuild it after editing the real source with:
+
+```bash
+python3 tools/build-preview.py     # writes preview.html
+```
+
+It is a preview, not the product: there is no auth, nothing is shared between
+devices, and no money moves. Everything below is the real thing.
 
 ---
 
@@ -190,7 +214,11 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 ├── index.html              # catalogue, hero, filters, grid
 ├── book.html               # detail page + reader overlay
 ├── library.html            # continue reading / liked / unlocked
+├── preview.html            # generated: single-file offline preview
 ├── 404.html
+├── tools/
+│   ├── preview-app.js      # controller for the single-file preview
+│   └── build-preview.py    # inlines css + js + demo data into preview.html
 ├── assets/
 │   ├── css/styles.css      # design tokens, components, light + dark
 │   └── js/
