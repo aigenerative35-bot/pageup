@@ -1,12 +1,17 @@
 /* PageUp — My library: continue reading, liked, unlocked */
-import { renderHeader, initAuth, onSession, shareBook, requireAuth, actorId, $, el, icon, escapeHtml } from './ui.js';
+import {
+  renderShell, initAuth, onSession, shareBook, requireAuth, actorId,
+  $, el, icon, escapeHtml,
+} from './ui.js';
+import { openCommentsDrawer } from './comments.js';
 import * as store from './store.js';
 import { renderBookCard } from './cards.js';
 
 const state = { catalog: [], liked: new Set(), owned: new Set() };
+const PANELS = ['continue', 'liked', 'owned'];
 
 async function boot() {
-  renderHeader();
+  renderShell();
   await initAuth();
   store.setUid(actorId());
 
@@ -14,28 +19,47 @@ async function boot() {
   state.catalog = items;
 
   document.querySelectorAll('.tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
-      ['continue', 'liked', 'owned'].forEach((p) => {
-        document.getElementById(`panel-${p}`).classList.toggle('hidden', p !== tab.dataset.panel);
-      });
-    });
+    tab.addEventListener('click', () => selectPanel(tab.dataset.panel, true));
   });
+  const hash = location.hash.replace('#', '');
+  if (PANELS.includes(hash)) selectPanel(hash, false);
 
   onSession(() => { store.setUid(actorId()); paint(); });
   paint();
 }
 
+function selectPanel(panel, updateHash) {
+  if (!PANELS.includes(panel)) panel = 'continue';
+  document.querySelectorAll('.tab').forEach((t) => {
+    t.setAttribute('aria-selected', String(t.dataset.panel === panel));
+  });
+  PANELS.forEach((p) => {
+    const node = document.getElementById(`panel-${p}`);
+    if (node) node.classList.toggle('hidden', p !== panel);
+  });
+  if (updateHash) history.replaceState(null, '', `#${panel}`);
+}
+
 async function paint() {
   const uid = actorId();
   if (uid) {
-    try { state.liked = await store.getMyLikes(uid, state.catalog.map((b) => b.id)); } catch { state.liked = new Set(); }
+    try { state.liked = await store.getMyLikes(uid, state.catalog.map((b) => b.id)); }
+    catch { state.liked = new Set(); }
   } else {
     state.liked = new Set();
   }
-
   store.subscribeUnlocked(uid, (set) => { state.owned = set; paintPanels(); });
   paintPanels();
+}
+
+function cardFor(book, { unlocked = false } = {}) {
+  return renderBookCard(book, {
+    liked: state.liked.has(book.id),
+    unlocked,
+    onLike,
+    onComment: (b) => openCommentsDrawer(b),
+    onShare: shareBook,
+  });
 }
 
 function paintPanels() {
@@ -58,31 +82,38 @@ function paintPanels() {
   const g2 = $('#gridLiked');
   g2.innerHTML = '';
   if (!liked.length) g2.append(emptyBox('No likes yet', 'Tap the heart on any book to keep it here.', './index.html', 'Find something to read'));
-  liked.forEach((b) => g2.append(renderBookCard(b, { liked: true, onLike: onLike, onShare: shareBook })));
+  liked.forEach((b) => g2.append(cardFor(b)));
 
   /* Unlocked */
   const owned = state.catalog.filter((b) => state.owned.has(b.id));
   const g3 = $('#gridOwned');
   g3.innerHTML = '';
-  if (!owned.length) g3.append(emptyBox('No premium unlocks yet', 'Unlock a premium title and it appears here forever.', './index.html?cat=Fiction', 'See premium books'));
-  owned.forEach((b) => g3.append(renderBookCard(b, { liked: state.liked.has(b.id), unlocked: true, onLike: onLike, onShare: shareBook })));
+  if (!owned.length) g3.append(emptyBox('No premium unlocks yet', 'Unlock a premium title and it appears here forever.', './index.html?sort=rating', 'See top rated books'));
+  owned.forEach((b) => g3.append(cardFor(b, { unlocked: true })));
+
+  /* Counts on the tabs */
+  const counts = { continue: cont.length, liked: liked.length, owned: owned.length };
+  Object.entries(counts).forEach(([panel, n]) => {
+    const tab = document.querySelector(`.tab[data-panel="${panel}"] .js-tab-count`);
+    if (tab) tab.textContent = n ? `(${n})` : '';
+  });
 }
 
 function withProgress(book, p) {
   const total = book.pages || 100;
   const pct = Math.min(99, Math.round(((p.page || 1) / total) * 100));
-  const card = renderBookCard(book, { liked: state.liked.has(book.id), unlocked: true, onLike: onLike, onShare: shareBook });
-  const bar = el('div', { style: 'margin-top:8px' }, [
+  const card = cardFor(book, { unlocked: true });
+  const bar = el('div', { style: 'margin-top:8px;padding-top:8px;border-top:1px solid var(--border)' }, [
     el('div', { style: 'height:4px;background:var(--surface-3);border-radius:99px;overflow:hidden' }, [
-      el('div', { style: `height:100%;width:${pct}%;background:var(--brand-600)` }),
+      el('div', { style: `height:100%;width:${pct}%;background:var(--accent)` }),
     ]),
-    el('div', { class: 'hint', text: `Page ${p.page || 1} of ${total} · ${pct}%` }),
+    el('div', { class: 'hint', style: 'margin-top:5px', text: `Page ${p.page || 1} of ${total} · ${pct}%` }),
   ]);
   card.querySelector('.card__body').append(bar);
   return card;
 }
 
-async function onLike(book, btn) {
+async function onLike(book) {
   if (!requireAuth('like books')) return;
   try {
     const nowLiked = await store.toggleLike(book.id, actorId());

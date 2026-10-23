@@ -1,8 +1,9 @@
-/* PageUp — home page controller (grid, filters, search, likes) */
+/* PageUp — home page controller (catalogue grid, filters, search, likes, comments) */
 import {
-  renderHeader, initAuth, onSession, shareBook, requireAuth, actorId,
+  renderShell, initAuth, onSession, shareBook, requireAuth, actorId,
   toast, $, el, icon, escapeHtml,
 } from './ui.js';
+import { openCommentsDrawer } from './comments.js';
 import * as store from './store.js';
 import { renderBookCard, skeletonCard } from './cards.js';
 import { debounce } from './util.js';
@@ -19,23 +20,12 @@ const state = {
   liked: new Set(),
 };
 
-const SORTS = [
-  { id: 'trending', label: 'Trending', icon: 'flame' },
-  { id: 'newest',   label: 'Newest',   icon: 'book' },
-  { id: 'rating',   label: 'Top rated', icon: 'star' },
-  { id: 'views',    label: 'Most read', icon: 'eye' },
-  { id: 'likes',    label: 'Most liked', icon: 'heart' },
-];
-
 async function boot() {
-  renderHeader();
+  renderShell();
   await initAuth();
   store.setUid(actorId());
 
-  onSession(() => {
-    store.setUid(actorId());
-    refreshLikes();
-  });
+  onSession(() => { store.setUid(actorId()); refreshLikes(); });
 
   const params = new URLSearchParams(location.search);
   state.search = params.get('q') || '';
@@ -48,13 +38,15 @@ async function boot() {
 
   const searchInput = $('#searchInput');
   if (searchInput) searchInput.addEventListener('input', () => runSearch(searchInput.value.trim()));
+
   await load(true);
   await loadStats();
 }
 
 /* ------------------------------------------------------------- Controls */
 function wireControls() {
-  $('#sortSelect')?.addEventListener('change', (e) => { state.sort = e.target.value; load(true); });
+  const sel = $('#sortSelect');
+  if (sel) { sel.value = state.sort; sel.addEventListener('change', (e) => { state.sort = e.target.value; load(true); }); }
 
   const sentinel = $('#loadSentinel');
   if (sentinel && 'IntersectionObserver' in window) {
@@ -79,6 +71,7 @@ function paintChips() {
       state.category = c.name;
       const params = new URLSearchParams();
       if (state.search) params.set('q', state.search);
+      if (state.sort !== 'trending') params.set('sort', state.sort);
       if (c.name !== 'all') params.set('cat', c.name);
       const qs = params.toString();
       history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
@@ -93,7 +86,7 @@ async function refreshCategories() {
   if (store.DEMO) return;
   try {
     const cats = await store.getCategories();
-    if (cats.length) store.demoCategories.length = 0, cats.forEach((c) => store.demoCategories.push(c.name));
+    if (cats.length) { store.demoCategories.length = 0; cats.forEach((c) => store.demoCategories.push(c.name)); }
     paintChips();
   } catch {}
 }
@@ -145,6 +138,7 @@ function renderGrid(items) {
       liked: state.liked.has(book.id),
       unlocked: false,
       onLike: handleLike,
+      onComment: handleComment,
       onShare: shareBook,
     }));
   });
@@ -176,9 +170,22 @@ async function handleLike(book, btn) {
     btn.setAttribute('aria-pressed', String(nowLiked));
     btn.firstElementChild.innerHTML = nowLiked ? icon('heartF') : icon('heart');
     const counter = btn.querySelector('.js-like-count');
-    if (counter) counter.textContent = String(Math.max(0, (Number(counter.textContent.replace(/[^\d]/g, '')) || 0) + (nowLiked ? 1 : -1)));
+    if (counter) {
+      const n = (Number(String(counter.textContent).replace(/[^\d]/g, '')) || 0) + (nowLiked ? 1 : -1);
+      counter.textContent = String(Math.max(0, n));
+    }
     toast(nowLiked ? 'Added to your likes' : 'Removed from likes', nowLiked ? 'success' : 'info', 1800);
   } catch (err) { console.error(err); toast('Could not update like', 'error'); }
+}
+
+/** Comments open in a slide-over so the reader never loses their place. */
+function handleComment(book) {
+  openCommentsDrawer(book, {
+    onCount: (n) => {
+      document.querySelectorAll(`.card[data-id="${CSS.escape(book.id)}"] .js-comment-count`)
+        .forEach((node) => { node.textContent = String(n); });
+    },
+  });
 }
 
 function renderResultMeta() {
@@ -186,7 +193,7 @@ function renderResultMeta() {
   if (!host) return;
   const n = state.items.length;
   const bits = [`${n} book${n === 1 ? '' : 's'}`];
-  if (state.search) bits.push(`for “${state.search}”`);
+  if (state.search) bits.push(`for \u201C${state.search}\u201D`);
   if (state.category !== 'all') bits.push(`in ${state.category}`);
   host.textContent = bits.join(' ');
   host.classList.toggle('hidden', n === 0 && !state.search);
@@ -202,12 +209,13 @@ function emptyState(title, msg) {
 async function loadStats() {
   try {
     const { items } = await store.listBooks({ sort: 'trending', pageSize: 200 });
-    const total = items.length;
-    const readers = items.reduce((a, b) => a + (b.views || 0), 0);
     const set = (id, v) => { const n = document.getElementById(id); if (n) n.textContent = v; };
-    set('statBooks', total ? `${total}+` : '—');
-    set('statReaders', readers ? compact(readers) : '—');
-    set('statFree', String(items.filter((b) => !b.isPremium).length || '—'));
+    const reads = items.reduce((a, b) => a + (b.views || 0), 0);
+    const comments = items.reduce((a, b) => a + (b.commentCount || 0), 0);
+    set('statBooks', items.length ? String(items.length) : '\u2014');
+    set('statReaders', reads ? compact(reads) : '\u2014');
+    set('statFree', String(items.filter((b) => !b.isPremium).length || '\u2014'));
+    set('statComments', comments ? compact(comments) : '\u2014');
   } catch {}
 }
 const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n);

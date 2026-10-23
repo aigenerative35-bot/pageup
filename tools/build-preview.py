@@ -42,7 +42,7 @@ cards_js = strip_module_syntax(read(os.path.join(SRC, "assets/js/cards.js")))
 app_js = read(os.path.join(WORK, "preview-app.js"))
 
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>"
-           "<rect width='24' height='24' rx='6' fill='%234f46e5'/>"
+           "<rect width='24' height='24' rx='6' fill='%23e42527'/>"
            "<path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>")
 
 HTML = f"""<!DOCTYPE html>
@@ -52,11 +52,11 @@ HTML = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PageUp &mdash; Interactive preview</title>
 <meta name="description" content="PageUp freemium reading platform &mdash; self-contained interactive preview. Browse the grid, open a book, read the sample, hit the paywall.">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#e42527">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 <link rel="icon" href="{FAVICON}">
 <style>
 {styles}
@@ -66,7 +66,7 @@ HTML = f"""<!DOCTYPE html>
 .pv-bar {{
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 9px 24px; font-size: 12.5px; font-weight: 600;
-  background: linear-gradient(90deg, #312e81, #4f46e5 60%, #6366f1);
+  background: linear-gradient(90deg, #a8181a, #e42527 62%, #f0473c);
   color: #fff;
 }}
 .pv-bar svg {{ width: 15px; height: 15px; flex: 0 0 auto; }}
@@ -92,7 +92,7 @@ HTML = f"""<!DOCTYPE html>
   <span class="pv-tag">Preview</span>
   <span>PageUp &mdash; single-file interactive preview</span>
   <span class="pv-spacer"></span>
-  <span class="pv-hint">No server, no Firebase &middot; likes, ratings, comments &amp; unlocks are saved in this browser</span>
+  <span class="pv-hint">No server, no Firebase &middot; likes, ratings, comments &amp; unlocks live in this browser</span>
   <button type="button" id="pvHide">Hide</button>
 </div>
 

@@ -5,82 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PageUp &mdash; Interactive preview</title>
 <meta name="description" content="PageUp freemium reading platform &mdash; self-contained interactive preview. Browse the grid, open a book, read the sample, hit the paywall.">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#e42527">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%234f46e5'/><path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%23e42527'/><path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>">
 <style>
 /* ==========================================================================
    PageUp — Design System
-   Enterprise-grade reading platform. Single stylesheet, no framework.
+   Styled in the Zoho visual language: #E42527 accent, 8pt grid, 6-8px radii,
+   flat white panels on a light grey canvas, top bar + left navigation rail.
+   Single stylesheet, no framework.
    ========================================================================== */
 
 /* ------------------------------ Tokens ---------------------------------- */
 :root {
-  /* Brand */
-  --brand-50:  #eef2ff;
-  --brand-100: #e0e7ff;
-  --brand-200: #c7d2fe;
-  --brand-400: #818cf8;
-  --brand-500: #6366f1;
-  --brand-600: #4f46e5;
-  --brand-700: #4338ca;
+  /* Zoho brand palette */
+  --zoho-red:      #e42527;
+  --zoho-red-600:  #c81e20;
+  --zoho-red-700:  #a8181a;
+  --zoho-red-100:  #fde7e7;
+  --zoho-red-50:   #fef4f4;
 
-  --accent-500: #f59e0b;
-  --success-500: #10b981;
-  --danger-500:  #ef4444;
+  --zoho-green:    #089949;
+  --zoho-green-50: #e9f7ef;
+  --zoho-blue:     #226db4;
+  --zoho-blue-50:  #eaf2fa;
+  --zoho-yellow:   #f9b21d;
+  --zoho-yellow-50:#fef7e8;
 
-  /* Neutrals (light theme) */
-  --bg:            #f7f8fb;
+  --accent:        var(--zoho-red);
+  --accent-600:    var(--zoho-red-600);
+  --accent-700:    var(--zoho-red-700);
+  --accent-50:     var(--zoho-red-50);
+  --accent-100:    var(--zoho-red-100);
+
+  /* Neutrals — light */
+  --bg:            #f5f6f7;
   --surface:       #ffffff;
-  --surface-2:     #f1f2f7;
-  --surface-3:     #e6e8f0;
-  --border:        #e3e5ee;
-  --border-strong: #d2d5e2;
-  --text:          #14161f;
-  --text-2:        #4a4f60;
-  --text-3:        #7b8093;
+  --surface-2:     #fafbfb;
+  --surface-3:     #f0f1f3;
+  --border:        #e4e6e8;
+  --border-strong: #d0d4d8;
+  --text:          #1a1a1a;
+  --text-2:        #5a6069;
+  --text-3:        #8b9199;
 
-  --shadow-xs: 0 1px 2px rgba(16, 18, 28, .06);
-  --shadow-sm: 0 2px 8px rgba(16, 18, 28, .07);
-  --shadow-md: 0 8px 24px rgba(16, 18, 28, .10);
-  --shadow-lg: 0 18px 48px rgba(16, 18, 28, .16);
+  /* Flat, Zoho-like elevation */
+  --shadow-xs: 0 1px 2px rgba(16, 20, 26, .05);
+  --shadow-sm: 0 1px 3px rgba(16, 20, 26, .08);
+  --shadow-md: 0 4px 14px rgba(16, 20, 26, .10);
+  --shadow-lg: 0 14px 40px rgba(16, 20, 26, .16);
 
-  --radius-sm: 8px;
-  --radius:    12px;
-  --radius-lg: 18px;
-  --radius-pill: 999px;
+  /* 6-8px radii, never pill except explicit tags */
+  --r-xs: 3px;
+  --r-sm: 4px;
+  --r:    6px;
+  --r-lg: 8px;
+  --r-pill: 999px;
 
-  --header-h: 64px;
-  --container: 1400px;
+  --topbar-h: 56px;
+  --sidebar-w: 232px;
+  --container: 1440px;
 
-  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font: "Zoho Puvi", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --font-read: "Source Serif 4", Georgia, "Times New Roman", serif;
 
   --ease: cubic-bezier(.22, .61, .36, 1);
 }
 
 [data-theme="dark"] {
-  --bg:            #0b0d14;
-  --surface:       #14161f;
-  --surface-2:     #1b1e2a;
-  --surface-3:     #232734;
-  --border:        #262a38;
-  --border-strong: #333849;
-  --text:          #eef0f6;
-  --text-2:        #b3b8c8;
-  --text-3:        #82889c;
+  --bg:            #16181c;
+  --surface:       #1e2126;
+  --surface-2:     #24282e;
+  --surface-3:     #2b3037;
+  --border:        #32373e;
+  --border-strong: #454b54;
+  --text:          #eceef1;
+  --text-2:        #b2b8c0;
+  --text-3:        #868d96;
 
-  --brand-50:  #1a1d33;
-  --brand-100: #21254a;
+  --zoho-red-50:   #2a1b1c;
+  --zoho-red-100:  #3a2123;
+  --zoho-green-50: #12261b;
+  --zoho-blue-50:  #14222f;
+  --zoho-yellow-50:#2a2314;
 
-  --shadow-xs: 0 1px 2px rgba(0,0,0,.4);
-  --shadow-sm: 0 2px 10px rgba(0,0,0,.45);
-  --shadow-md: 0 10px 30px rgba(0,0,0,.55);
-  --shadow-lg: 0 22px 60px rgba(0,0,0,.65);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, .55);
+  --shadow-lg: 0 16px 44px rgba(0, 0, 0, .65);
 }
 
 /* ------------------------------ Reset ----------------------------------- */
@@ -91,7 +107,7 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -100,19 +116,21 @@ img, svg, video { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; }
 a { color: inherit; text-decoration: none; }
-h1, h2, h3, h4 { margin: 0; line-height: 1.25; letter-spacing: -.015em; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.3; letter-spacing: -.01em; font-weight: 600; }
 p { margin: 0; }
 ul { margin: 0; padding: 0; list-style: none; }
-:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; border-radius: 4px; }
-::selection { background: var(--brand-200); color: #14161f; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: var(--r-xs); }
+::selection { background: var(--zoho-red-100); color: var(--text); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 
-/* ------------------------------ Layout ---------------------------------- */
+/* ------------------------------ Shell ----------------------------------- */
+body.has-shell { padding-top: var(--topbar-h); padding-left: var(--sidebar-w); }
+@media (max-width: 1024px) { body.has-shell { padding-left: 0; } }
+
 .container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 24px; }
 .stack { display: flex; flex-direction: column; }
 .row { display: flex; align-items: center; }
@@ -124,445 +142,579 @@ ul { margin: 0; padding: 0; list-style: none; }
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 
-/* ------------------------------ Header ---------------------------------- */
-.app-header {
-  position: sticky; top: 0; z-index: 60;
-  height: var(--header-h);
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
+/* ---- Top bar ---- */
+.app-topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 70;
+  height: var(--topbar-h);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 20px;
 }
-.app-header .container { height: 100%; display: flex; align-items: center; gap: 16px; }
-
-.brand { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.app-topbar__burger { display: none; }
+.brand { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
 .brand__mark {
-  width: 36px; height: 36px; border-radius: 10px; flex: 0 0 auto;
-  background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
-  display: grid; place-items: center; color: #fff;
-  box-shadow: 0 6px 16px rgba(79,70,229,.35);
+  width: 30px; height: 30px; border-radius: var(--r); flex: 0 0 auto;
+  background: var(--zoho-red); display: grid; place-items: center; color: #fff;
 }
-.brand__mark svg { width: 20px; height: 20px; }
-.brand__name { font-weight: 800; font-size: 19px; letter-spacing: -.03em; }
-.brand__name span { color: var(--brand-600); }
-[data-theme="dark"] .brand__name span { color: var(--brand-400); }
+.brand__mark svg { width: 17px; height: 17px; }
+.brand__name { font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
+.brand__name span { color: var(--zoho-red); }
+.brand__divider { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+.brand__product { font-size: 13px; color: var(--text-3); font-weight: 500; }
 
 /* Search */
-.search { flex: 1 1 auto; max-width: 620px; position: relative; }
+.search { flex: 1 1 auto; max-width: 520px; position: relative; }
 .search__input {
-  width: 100%; height: 42px; padding: 0 44px 0 44px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-strong);
-  background: var(--surface-2);
-  transition: border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+  width: 100%; height: 34px; padding: 0 36px 0 34px;
+  border-radius: var(--r); border: 1px solid var(--border-strong);
+  background: var(--surface-2); font-size: 13.5px;
+  transition: border-color .15s var(--ease), background .15s var(--ease), box-shadow .15s var(--ease);
 }
 .search__input::placeholder { color: var(--text-3); }
 .search__input:focus {
-  outline: none; background: var(--surface);
-  border-color: var(--brand-500);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-500) 18%, transparent);
+  outline: none; background: var(--surface); border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-100);
 }
-.search__icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
-.search__icon svg { width: 18px; height: 18px; }
-.search__clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-3); padding: 6px; border-radius: 999px; }
+.search__icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
+.search__icon svg { width: 16px; height: 16px; }
+.search__clear { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); color: var(--text-3); padding: 5px; border-radius: var(--r-sm); }
 .search__clear:hover { background: var(--surface-3); color: var(--text); }
+.search__clear svg { width: 14px; height: 14px; }
 
-.header-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.header-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; margin-left: auto; }
+
+/* ---- Sidebar ---- */
+.app-sidebar {
+  position: fixed; top: var(--topbar-h); left: 0; bottom: 0; z-index: 65;
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; padding: 14px 12px 20px;
+}
+.nav-section { margin-bottom: 6px; }
+.nav-section__label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--text-3); padding: 12px 10px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 8px 10px; border-radius: var(--r);
+  font-size: 13.5px; font-weight: 500; color: var(--text-2);
+  text-align: left; position: relative;
+  transition: background .13s var(--ease), color .13s var(--ease);
+}
+.nav-item:hover { background: var(--surface-3); color: var(--text); }
+.nav-item svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.nav-item .nav-count {
+  margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--text-3);
+  background: var(--surface-3); border-radius: var(--r-pill); padding: 1px 7px;
+}
+.nav-item.is-active { background: var(--zoho-red-50); color: var(--zoho-red); font-weight: 600; }
+.nav-item.is-active svg { color: var(--zoho-red); }
+.nav-item.is-active::before {
+  content: ""; position: absolute; left: -12px; top: 6px; bottom: 6px;
+  width: 3px; background: var(--zoho-red); border-radius: 0 3px 3px 0;
+}
+.nav-item.is-active .nav-count { background: var(--zoho-red-100); color: var(--zoho-red); }
+
+.sidebar-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); }
+.plan-card {
+  background: linear-gradient(135deg, var(--zoho-red-50), var(--surface));
+  border: 1px solid var(--zoho-red-100);
+  border-radius: var(--r-lg); padding: 12px; margin-top: 10px;
+}
+.plan-card b { display: block; font-size: 13px; }
+.plan-card p { font-size: 12px; color: var(--text-3); margin: 3px 0 10px; }
+
+.sidebar-scrim {
+  position: fixed; inset: var(--topbar-h) 0 0 0; z-index: 64;
+  background: rgba(16, 20, 26, .45); display: none;
+}
+
+@media (max-width: 1024px) {
+  .app-sidebar { transform: translateX(-100%); transition: transform .22s var(--ease); box-shadow: var(--shadow-lg); }
+  body.sidebar-open .app-sidebar { transform: translateX(0); }
+  body.sidebar-open .sidebar-scrim { display: block; }
+  .app-topbar__burger { display: grid; }
+}
 
 /* ------------------------------ Buttons --------------------------------- */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  height: 40px; padding: 0 16px;
-  border-radius: var(--radius-sm);
-  font-weight: 600; font-size: 14px; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 34px; padding: 0 14px;
+  border-radius: var(--r);
+  font-weight: 500; font-size: 13.5px; white-space: nowrap;
   border: 1px solid transparent;
-  transition: transform .12s var(--ease), background .16s var(--ease),
-              border-color .16s var(--ease), box-shadow .16s var(--ease), color .16s var(--ease);
+  transition: background .14s var(--ease), border-color .14s var(--ease),
+              color .14s var(--ease), box-shadow .14s var(--ease);
 }
-.btn:active { transform: translateY(1px) scale(.99); }
-.btn svg { width: 18px; height: 18px; flex: 0 0 auto; }
-.btn--primary { background: var(--brand-600); color: #fff; box-shadow: 0 4px 14px rgba(79,70,229,.32); }
-.btn--primary:hover { background: var(--brand-700); box-shadow: 0 8px 22px rgba(79,70,229,.42); }
-.btn--ghost { background: var(--surface-2); color: var(--text); border-color: var(--border); }
-.btn--ghost:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.btn--outline { background: transparent; color: var(--text); border-color: var(--border-strong); }
-.btn--outline:hover { background: var(--surface-2); }
-.btn--gold { background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,.35); }
-.btn--gold:hover { filter: brightness(1.06); }
-.btn--lg { height: 48px; padding: 0 24px; font-size: 15px; border-radius: var(--radius); }
-.btn--sm { height: 34px; padding: 0 12px; font-size: 13px; }
-.btn--icon { width: 40px; padding: 0; }
-.btn[disabled] { opacity: .5; pointer-events: none; }
+.btn svg { width: 16px; height: 16px; flex: 0 0 auto; }
+.btn--primary { background: var(--accent); color: #fff; box-shadow: var(--shadow-xs); }
+.btn--primary:hover { background: var(--accent-600); }
+.btn--primary:active { background: var(--accent-700); }
+.btn--ghost { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+.btn--ghost:hover { background: var(--surface-3); border-color: var(--text-3); }
+.btn--outline { background: transparent; color: var(--accent); border-color: var(--accent); }
+.btn--outline:hover { background: var(--accent-50); }
+.btn--gold { background: var(--zoho-yellow); color: #3d2c00; }
+.btn--gold:hover { background: #eda712; }
+.btn--danger { background: var(--surface); color: var(--zoho-red); border-color: var(--zoho-red-100); }
+.btn--danger:hover { background: var(--zoho-red-50); }
+.btn--lg { height: 40px; padding: 0 18px; font-size: 14px; border-radius: var(--r); }
+.btn--sm { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.btn--icon { width: 34px; padding: 0; }
 .btn--block { width: 100%; }
+.btn[disabled] { opacity: .5; pointer-events: none; }
 
 .icon-btn {
-  width: 40px; height: 40px; border-radius: 999px;
+  width: 34px; height: 34px; border-radius: var(--r);
   display: grid; place-items: center; color: var(--text-2);
-  transition: background .16s var(--ease), color .16s var(--ease);
+  transition: background .14s var(--ease), color .14s var(--ease);
 }
-.icon-btn:hover { background: var(--surface-2); color: var(--text); }
-.icon-btn svg { width: 20px; height: 20px; }
+.icon-btn:hover { background: var(--surface-3); color: var(--text); }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn--badge { position: relative; }
+.icon-btn--badge::after {
+  content: ""; position: absolute; top: 6px; right: 7px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--zoho-red);
+  border: 1.5px solid var(--surface);
+}
 
-/* ------------------------------ Chips / Tabs ---------------------------- */
-.chipbar {
-  display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 2px;
-  scrollbar-width: none;
+/* ------------------------------ Page head ------------------------------- */
+.page-head {
+  display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+  padding: 24px 0 16px;
 }
-.chipbar::-webkit-scrollbar { display: none; }
-.chip {
-  flex: 0 0 auto; height: 36px; padding: 0 16px;
-  display: inline-flex; align-items: center; gap: 8px;
-  border-radius: var(--radius-pill);
-  background: var(--surface-2); border: 1px solid var(--border);
-  font-size: 13.5px; font-weight: 600; color: var(--text-2);
-  transition: all .16s var(--ease);
+.page-head h1 { font-size: 22px; font-weight: 600; }
+.page-head p { color: var(--text-3); font-size: 13px; margin-top: 3px; }
+.page-head .row { margin-left: auto; }
+.crumbs { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-3); margin-bottom: 6px; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs svg { width: 12px; height: 12px; }
+
+/* ------------------------------ Panels ---------------------------------- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-xs);
 }
-.chip:hover { background: var(--surface-3); color: var(--text); }
-.chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.panel__head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.panel__head h2, .panel__head h3 { font-size: 15px; font-weight: 600; }
+.panel__head p { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.panel__body { padding: 18px; }
+/* Icons sitting directly in a flex header row must be sized explicitly —
+   an unsized inline SVG stretches to fill the flex track. */
+.panel__head > svg, .panel__head > span > svg,
+.drawer__head > svg, .drawer__head > span > svg {
+  width: 17px; height: 17px; flex: 0 0 auto; color: var(--text-3);
+}
 
 /* ------------------------------ Hero ------------------------------------ */
 .hero {
   position: relative; overflow: hidden;
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(1200px 400px at 12% -10%, color-mix(in srgb, var(--brand-500) 45%, transparent), transparent 60%),
-    radial-gradient(900px 380px at 88% 120%, color-mix(in srgb, var(--accent-500) 38%, transparent), transparent 62%),
-    linear-gradient(120deg, #1e1b4b, #312e81 55%, #4338ca);
-  color: #fff;
-  padding: 44px 44px 40px;
-  margin: 26px 0 34px;
-  box-shadow: var(--shadow-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--zoho-red);
+  border-radius: var(--r-lg);
+  padding: 26px 30px;
+  margin: 22px 0 26px;
+  box-shadow: var(--shadow-xs);
 }
 .hero::after {
-  content: ""; position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px);
-  background-size: 22px 22px; opacity: .5; pointer-events: none;
+  content: ""; position: absolute; right: -60px; top: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, var(--zoho-red-50), transparent 68%);
+  pointer-events: none;
 }
 .hero__eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24);
-  padding: 6px 12px; border-radius: 999px; margin-bottom: 18px;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--zoho-red); background: var(--zoho-red-50);
+  border: 1px solid var(--zoho-red-100);
+  padding: 4px 10px; border-radius: var(--r-sm); margin-bottom: 14px;
 }
-.hero h1 { font-size: clamp(28px, 4.2vw, 46px); font-weight: 800; letter-spacing: -.03em; max-width: 720px; }
-.hero p { margin-top: 14px; font-size: 16px; max-width: 620px; color: rgba(255,255,255,.86); }
-.hero__actions { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; position: relative; z-index: 1; }
-.hero__stats { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 34px; position: relative; z-index: 1; }
-.hero__stat b { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
-.hero__stat span { font-size: 13px; color: rgba(255,255,255,.72); }
+.hero h1 { font-size: clamp(22px, 2.9vw, 32px); font-weight: 700; letter-spacing: -.025em; max-width: 720px; }
+.hero p { margin-top: 10px; font-size: 14.5px; max-width: 640px; color: var(--text-2); }
+.hero__actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; position: relative; z-index: 1; }
+.hero__stats {
+  margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 18px;
+  position: relative; z-index: 1;
+}
+.hero__stat b { display: block; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.hero__stat span { font-size: 12px; color: var(--text-3); }
 
-/* ------------------------------ Section heads --------------------------- */
-.section-head { display: flex; align-items: flex-end; gap: 16px; margin: 34px 0 18px; }
-.section-head h2 { font-size: 21px; font-weight: 800; }
-.section-head p { color: var(--text-3); font-size: 13.5px; margin-top: 3px; }
-.section-head .row { margin-left: auto; }
+/* ------------------------------ Filter bar ------------------------------ */
+.filterbar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 12px 14px; margin-bottom: 18px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
+}
+.chipbar { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; }
+.chipbar::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto; height: 30px; padding: 0 12px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: var(--r); background: var(--surface);
+  border: 1px solid var(--border-strong);
+  font-size: 12.5px; font-weight: 500; color: var(--text-2);
+  transition: all .14s var(--ease);
+}
+.chip:hover { background: var(--surface-3); color: var(--text); }
+.chip[aria-pressed="true"] { background: var(--zoho-red-50); border-color: var(--zoho-red); color: var(--zoho-red); font-weight: 600; }
+.chip svg { width: 14px; height: 14px; }
 
 /* ------------------------------ Book grid ------------------------------- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: 26px 20px;
-  padding-bottom: 60px;
+  grid-template-columns: repeat(auto-fill, minmax(214px, 1fr));
+  gap: 18px;
+  padding-bottom: 48px;
 }
-@media (max-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px 12px; } }
+@media (max-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; } }
 
-.card { position: relative; display: flex; flex-direction: column; gap: 12px; }
-.card__thumb {
-  position: relative; display: block; aspect-ratio: 3 / 4.1;
-  border-radius: var(--radius); overflow: hidden;
-  background: var(--surface-3);
-  box-shadow: var(--shadow-sm);
-  transition: transform .28s var(--ease), box-shadow .28s var(--ease);
+.card {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: border-color .18s var(--ease), box-shadow .18s var(--ease), transform .18s var(--ease);
 }
-.card:hover .card__thumb { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+.card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.card__thumb {
+  position: relative; display: block; aspect-ratio: 3 / 3.9;
+  background: var(--surface-3); overflow: hidden;
+}
 .card__thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-.card__badges { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; flex-wrap: wrap; z-index: 2; }
+.card__badges { position: absolute; top: 8px; left: 8px; display: flex; gap: 5px; flex-wrap: wrap; z-index: 2; }
 .badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  height: 24px; padding: 0 9px; border-radius: 999px;
-  font-size: 11px; font-weight: 700; letter-spacing: .02em;
-  background: rgba(10,12,20,.72); color: #fff; backdrop-filter: blur(6px);
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 21px; padding: 0 7px; border-radius: var(--r-sm);
+  font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  background: rgba(12, 14, 18, .78); color: #fff; backdrop-filter: blur(4px);
 }
-.badge svg { width: 12px; height: 12px; }
-.badge--free { background: rgba(16,185,129,.92); }
-.badge--premium { background: linear-gradient(135deg,#f59e0b,#f97316); }
-.badge--pdf { background: rgba(239,68,68,.92); }
-.badge--epub { background: rgba(99,102,241,.92); }
-
-.card__format { position: absolute; top: 10px; right: 10px; z-index: 2; }
+.badge svg { width: 11px; height: 11px; }
+.badge--free { background: var(--zoho-green); }
+.badge--premium { background: var(--zoho-yellow); color: #3d2c00; }
+.badge--pdf { background: var(--zoho-red); }
+.badge--epub { background: var(--zoho-blue); }
+.badge--muted { background: var(--surface-3); color: var(--text-2); }
+.card__format { position: absolute; top: 8px; right: 8px; z-index: 2; }
 
 .card__overlay {
   position: absolute; inset: 0; z-index: 3;
-  background: linear-gradient(to top, rgba(8,9,15,.92) 0%, rgba(8,9,15,.45) 42%, transparent 72%);
-  opacity: 0; transition: opacity .26s var(--ease);
-  display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
-  padding: 14px;
+  background: linear-gradient(to top, rgba(12, 14, 18, .94) 0%, rgba(12, 14, 18, .55) 45%, transparent 76%);
+  opacity: 0; transition: opacity .2s var(--ease);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 9px;
+  padding: 12px;
 }
 .card:hover .card__overlay, .card:focus-within .card__overlay { opacity: 1; }
-/* Touch devices never hover — keep the read / like / share controls visible. */
 @media (hover: none) { .card__overlay { opacity: 1; } }
-.card__overlay p { color: rgba(255,255,255,.82); font-size: 12.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.card__overlay-actions { display: flex; gap: 8px; }
-.overlay-btn {
-  flex: 1; height: 36px; border-radius: var(--radius-sm);
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  font-size: 13px; font-weight: 700; color: #fff;
-  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22);
-  backdrop-filter: blur(6px);
-  transition: background .16s var(--ease);
+.card__overlay p {
+  color: rgba(255, 255, 255, .84); font-size: 12px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
-.overlay-btn:hover { background: rgba(255,255,255,.28); }
-.overlay-btn svg { width: 16px; height: 16px; }
-.overlay-btn--primary { background: var(--brand-600); border-color: transparent; }
-.overlay-btn--primary:hover { background: var(--brand-700); }
+.card__overlay-actions { display: flex; gap: 6px; }
+.card__overlay-actions--stacked { flex-direction: column; }
+.overlay-row { display: flex; gap: 6px; }
+.overlay-btn {
+  flex: 1; height: 32px; border-radius: var(--r-sm);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 12.5px; font-weight: 600; color: #fff;
+  background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .24);
+  backdrop-filter: blur(4px);
+  transition: background .14s var(--ease);
+}
+.overlay-btn:hover { background: rgba(255, 255, 255, .3); }
+.overlay-btn svg { width: 15px; height: 15px; }
+.overlay-btn--primary { background: var(--accent); border-color: transparent; }
+.overlay-btn--primary:hover { background: var(--accent-600); }
 
-.card__body { display: flex; gap: 10px; }
-.card__meta { min-width: 0; flex: 1; }
+.card__body { display: flex; flex-direction: column; gap: 8px; padding: 12px; flex: 1; }
 .card__title {
-  font-size: 14.5px; font-weight: 700; line-height: 1.35;
+  font-size: 13.5px; font-weight: 600; line-height: 1.4;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.card__author { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
-.card__stats { display: flex; align-items: center; gap: 10px; margin-top: 7px; font-size: 12.5px; color: var(--text-3); flex-wrap: wrap; }
+.card__title:hover { color: var(--accent); }
+.card__author { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.card__stats { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 8px; font-size: 12px; color: var(--text-3); flex-wrap: wrap; border-top: 1px solid var(--border); }
 .card__stats svg { width: 13px; height: 13px; flex: 0 0 auto; }
 
+/* The generated cover carries its own title; hide it while the hover overlay
+   (which repeats the title in the card body) is on screen. */
+.card:hover .cover-fallback__text,
+.card:focus-within .cover-fallback__text { opacity: 0; }
+@media (hover: none) { .cover-fallback__text { opacity: 0; } }
+.cover-fallback__text { transition: opacity .2s var(--ease); }
+
+/* Comment affordance on the card */
+.card__comment {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; color: var(--text-2);
+  padding: 3px 7px; border-radius: var(--r-sm); margin-left: auto;
+  transition: background .14s var(--ease), color .14s var(--ease);
+}
+.card__comment:hover { background: var(--zoho-red-50); color: var(--accent); }
+.card__comment svg { width: 13px; height: 13px; }
+
 /* ------------------------------ Stars ----------------------------------- */
-.stars { display: inline-flex; align-items: center; gap: 2px; }
-.stars svg { width: 13px; height: 13px; }
-.star--on { color: var(--accent-500); }
+.stars { display: inline-flex; align-items: center; gap: 1px; }
+.stars svg { width: 12.5px; height: 12.5px; }
+.star--on { color: var(--zoho-yellow); }
 .star--off { color: var(--border-strong); }
-.rating-num { font-weight: 700; color: var(--text-2); }
+.rating-num { font-weight: 600; color: var(--text-2); }
 
 /* ------------------------------ Empty / skeleton ------------------------ */
-.empty {
-  grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: var(--text-3);
-}
-.empty svg { width: 52px; height: 52px; margin: 0 auto 16px; opacity: .5; }
-.empty h3 { color: var(--text); font-size: 18px; margin-bottom: 6px; }
+.empty { grid-column: 1 / -1; text-align: center; padding: 64px 20px; color: var(--text-3); }
+.empty svg { width: 40px; height: 40px; margin: 0 auto 14px; opacity: .45; }
+.empty h3 { color: var(--text); font-size: 16px; margin-bottom: 5px; font-weight: 600; }
+.empty p { font-size: 13.5px; }
 
-.skel { border-radius: var(--radius); background: var(--surface-2); position: relative; overflow: hidden; }
+.skel { border-radius: var(--r); background: var(--surface-3); position: relative; overflow: hidden; }
 .skel::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--text) 7%, transparent), transparent);
-  animation: shimmer 1.4s infinite;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  animation: shimmer 1.3s infinite;
 }
+[data-theme="dark"] .skel::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent); }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
-.skel-card { display: flex; flex-direction: column; gap: 12px; }
-.skel-thumb { aspect-ratio: 3/4.1; }
-.skel-line { height: 12px; }
+.skel-card { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); padding-bottom: 14px; }
+.skel-thumb { aspect-ratio: 3/3.9; border-radius: 0; }
+.skel-line { height: 11px; margin: 10px 12px; }
 
 /* ------------------------------ Modal / Drawer -------------------------- */
 .overlay {
   position: fixed; inset: 0; z-index: 100;
-  background: rgba(8,9,15,.62); backdrop-filter: blur(4px);
+  background: rgba(16, 20, 26, .5);
   display: grid; place-items: center; padding: 20px;
-  opacity: 0; animation: fadeIn .18s var(--ease) forwards;
+  opacity: 0; animation: fadeIn .16s var(--ease) forwards;
 }
 @keyframes fadeIn { to { opacity: 1; } }
 .modal {
   width: 100%; max-width: 440px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg); padding: 28px;
-  animation: popIn .22s var(--ease);
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  animation: popIn .18s var(--ease);
   max-height: 92vh; overflow: auto;
 }
 .modal--wide { max-width: 560px; }
-@keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.98); } }
-.modal__head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
-.modal__head h3 { font-size: 20px; font-weight: 800; }
-.modal__head p { color: var(--text-3); font-size: 13.5px; margin-top: 4px; }
+@keyframes popIn { from { opacity: 0; transform: translateY(10px); } }
+.modal__head {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 18px 20px; border-bottom: 1px solid var(--border);
+}
+.modal__head h3 { font-size: 16px; font-weight: 600; }
+.modal__head p { color: var(--text-3); font-size: 13px; margin-top: 3px; }
+.modal__body { padding: 20px; }
+.modal__foot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
 
 .drawer {
   position: fixed; top: 0; right: 0; bottom: 0; z-index: 110;
-  width: min(420px, 100%); background: var(--surface);
+  width: min(440px, 100%); background: var(--surface);
   border-left: 1px solid var(--border); box-shadow: var(--shadow-lg);
   display: flex; flex-direction: column;
-  animation: slideIn .26s var(--ease);
+  animation: slideIn .22s var(--ease);
 }
 @keyframes slideIn { from { transform: translateX(100%); } }
 .drawer__head {
   display: flex; align-items: center; gap: 12px;
-  padding: 18px 20px; border-bottom: 1px solid var(--border); flex: 0 0 auto;
+  padding: 14px 18px; border-bottom: 1px solid var(--border); flex: 0 0 auto;
 }
-.drawer__head h3 { font-size: 16px; font-weight: 800; }
-.drawer__body { flex: 1; overflow-y: auto; padding: 18px 20px; }
-.drawer__foot { flex: 0 0 auto; padding: 14px 20px; border-top: 1px solid var(--border); }
+.drawer__head h3 { font-size: 15px; font-weight: 600; }
+.drawer__head p { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.drawer__body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+.drawer__foot { flex: 0 0 auto; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--surface-2); }
 
 /* ------------------------------ Forms ----------------------------------- */
 .field { margin-bottom: 14px; }
-.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-2); }
+.field label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5px; color: var(--text-2); }
 .input, .textarea, .select {
-  width: 100%; height: 44px; padding: 0 14px;
-  border-radius: var(--radius-sm); border: 1px solid var(--border-strong);
-  background: var(--surface-2);
-  transition: border-color .16s var(--ease), box-shadow .16s var(--ease), background .16s var(--ease);
+  width: 100%; height: 36px; padding: 0 12px;
+  border-radius: var(--r); border: 1px solid var(--border-strong);
+  background: var(--surface); font-size: 13.5px;
+  transition: border-color .14s var(--ease), box-shadow .14s var(--ease);
 }
-.textarea { height: auto; min-height: 92px; padding: 12px 14px; resize: vertical; line-height: 1.55; }
+.textarea { height: auto; min-height: 84px; padding: 10px 12px; resize: vertical; line-height: 1.55; }
 .input:focus, .textarea:focus, .select:focus {
-  outline: none; background: var(--surface); border-color: var(--brand-500);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-500) 18%, transparent);
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-100);
 }
-.hint { font-size: 12px; color: var(--text-3); margin-top: 6px; }
-.error-text { font-size: 13px; color: var(--danger-500); margin-top: 10px; }
-.divider { display: flex; align-items: center; gap: 12px; color: var(--text-3); font-size: 12.5px; margin: 18px 0; }
+.hint { font-size: 12px; color: var(--text-3); }
+.error-text { font-size: 12.5px; color: var(--zoho-red); margin-top: 8px; }
+.divider { display: flex; align-items: center; gap: 12px; color: var(--text-3); font-size: 12px; margin: 16px 0; }
 .divider::before, .divider::after { content: ""; height: 1px; background: var(--border); flex: 1; }
 
 /* ------------------------------ Tabs ------------------------------------ */
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
 .tab {
-  padding: 11px 14px; font-size: 14px; font-weight: 600; color: var(--text-3);
+  padding: 10px 14px; font-size: 13.5px; font-weight: 500; color: var(--text-3);
   border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: color .16s var(--ease), border-color .16s var(--ease);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: color .14s var(--ease), border-color .14s var(--ease);
 }
 .tab:hover { color: var(--text); }
-.tab[aria-selected="true"] { color: var(--brand-600); border-color: var(--brand-600); }
-[data-theme="dark"] .tab[aria-selected="true"] { color: var(--brand-400); border-color: var(--brand-400); }
+.tab[aria-selected="true"] { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+.tab svg { width: 15px; height: 15px; }
 
 /* ------------------------------ Book detail ----------------------------- */
-.detail { display: grid; grid-template-columns: 320px 1fr; gap: 40px; padding: 30px 0 60px; }
-@media (max-width: 900px) { .detail { grid-template-columns: 1fr; gap: 24px; } }
+.detail { display: grid; grid-template-columns: 300px 1fr; gap: 28px; padding: 22px 0 48px; }
+@media (max-width: 900px) { .detail { grid-template-columns: 1fr; gap: 20px; } }
 .detail__cover {
-  position: sticky; top: calc(var(--header-h) + 20px);
-  aspect-ratio: 3/4.1; border-radius: var(--radius-lg);
-  overflow: hidden; box-shadow: var(--shadow-lg); background: var(--surface-3);
+  position: sticky; top: calc(var(--topbar-h) + 20px);
+  aspect-ratio: 3/4; border-radius: var(--r-lg);
+  overflow: hidden; border: 1px solid var(--border);
+  background: var(--surface-3); box-shadow: var(--shadow-sm);
 }
-@media (max-width: 900px) { .detail__cover { position: static; max-width: 280px; } }
+@media (max-width: 900px) { .detail__cover { position: static; max-width: 260px; } }
 .detail__cover img { width: 100%; height: 100%; object-fit: cover; }
-.detail h1 { font-size: clamp(24px, 3.4vw, 36px); font-weight: 800; letter-spacing: -.03em; }
-.detail__author { color: var(--text-2); font-size: 15px; margin-top: 8px; }
-.detail__author b { color: var(--text); font-weight: 700; }
-.detail__stats { display: flex; flex-wrap: wrap; gap: 20px; margin: 20px 0; padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.detail__stat b { display: block; font-size: 18px; font-weight: 800; }
-.detail__stat span { font-size: 12.5px; color: var(--text-3); }
-.detail__desc { color: var(--text-2); font-size: 15px; line-height: 1.7; margin: 18px 0 24px; }
-.detail__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
-
-.meta-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 26px; }
-.meta-list div { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
-.meta-list dt { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); font-weight: 700; }
-.meta-list dd { margin: 4px 0 0; font-weight: 600; font-size: 14px; }
-
-/* Premium gate */
-.gate {
-  border: 1px solid color-mix(in srgb, var(--accent-500) 40%, var(--border));
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-500) 10%, var(--surface)), var(--surface));
-  border-radius: var(--radius-lg); padding: 22px; margin: 22px 0;
+.detail h1 { font-size: clamp(20px, 2.6vw, 27px); font-weight: 700; letter-spacing: -.02em; }
+.detail__author { color: var(--text-2); font-size: 14px; margin-top: 6px; }
+.detail__author b { color: var(--text); font-weight: 600; }
+.detail__stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0; margin: 18px 0; border: 1px solid var(--border); border-radius: var(--r-lg);
+  overflow: hidden; background: var(--surface);
 }
-.gate h3 { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-.gate h3 svg { width: 20px; height: 20px; flex: 0 0 auto; }
-.gate ul li svg, .modal ul li svg { width: 16px; height: 16px; flex: 0 0 auto; vertical-align: -3px; margin-right: 6px; color: var(--success-500); }
-.gate p { color: var(--text-2); font-size: 14px; margin: 8px 0 16px; }
+.detail__stat { padding: 12px 16px; border-right: 1px solid var(--border); }
+.detail__stat:last-child { border-right: 0; }
+.detail__stat b { display: block; font-size: 17px; font-weight: 700; }
+.detail__stat span { font-size: 11.5px; color: var(--text-3); }
+.detail__desc { color: var(--text-2); font-size: 14px; line-height: 1.7; margin: 14px 0 18px; }
+.detail__actions { display: flex; flex-wrap: wrap; gap: 9px; margin: 18px 0; }
+
+.meta-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 22px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+@media (max-width: 700px) { .meta-list { grid-template-columns: repeat(2, 1fr); } }
+.meta-list div { padding: 10px 14px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
+.meta-list dt { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); font-weight: 700; }
+.meta-list dd { margin: 3px 0 0; font-weight: 600; font-size: 13.5px; }
+
+.gate {
+  border: 1px solid var(--zoho-yellow);
+  background: var(--zoho-yellow-50);
+  border-radius: var(--r-lg); padding: 18px; margin: 18px 0;
+}
+.gate h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.gate h3 svg { width: 18px; height: 18px; flex: 0 0 auto; color: #a97b06; }
+.gate ul li svg, .modal ul li svg { width: 15px; height: 15px; flex: 0 0 auto; vertical-align: -3px; margin-right: 6px; color: var(--zoho-green); }
+.gate p { color: var(--text-2); font-size: 13.5px; margin: 7px 0 14px; }
 
 /* ------------------------------ Reader ---------------------------------- */
 .reader-shell { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; }
 .reader-bar {
-  height: 56px; flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
-  padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+  height: 52px; flex: 0 0 auto; display: flex; align-items: center; gap: 10px;
+  padding: 0 14px; background: var(--surface); border-bottom: 1px solid var(--border);
 }
-.reader-bar__title { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
-.reader-bar__sub { font-size: 12px; color: var(--text-3); }
+.reader-bar__title { font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 38vw; }
+.reader-bar__sub { font-size: 11.5px; color: var(--text-3); }
 .reader-progress { height: 3px; background: var(--surface-3); flex: 0 0 auto; }
-.reader-progress__bar { height: 100%; width: 0; background: var(--brand-600); transition: width .2s var(--ease); }
+.reader-progress__bar { height: 100%; width: 0; background: var(--accent); transition: width .2s var(--ease); }
 .reader-main { flex: 1; position: relative; overflow: hidden; display: flex; }
-.reader-stage { flex: 1; position: relative; overflow: auto; background: var(--surface-2); }
+.reader-stage { flex: 1; position: relative; overflow: auto; background: var(--surface-3); }
 #viewer { width: 100%; height: 100%; }
 #viewer iframe { border: 0; }
 .reader-nav {
-  width: 64px; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+  width: 56px; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 10px; border: 0; color: var(--text-2); background: var(--surface);
-  border-left: 1px solid var(--border); transition: background .16s var(--ease);
+  border-left: 1px solid var(--border); transition: background .14s var(--ease);
 }
 .reader-nav--prev { border-left: 0; border-right: 1px solid var(--border); }
-.reader-nav:hover { background: var(--surface-2); color: var(--text); }
-.reader-nav.reader-nav--locked { color: var(--accent-500); background: color-mix(in srgb, var(--accent-500) 12%, var(--surface)); }
-.reader-nav.reader-nav--locked:hover { background: color-mix(in srgb, var(--accent-500) 22%, var(--surface)); }
+.reader-nav:hover { background: var(--surface-3); color: var(--text); }
+.reader-nav.reader-nav--locked { color: var(--zoho-yellow); background: var(--zoho-yellow-50); }
+.reader-nav.reader-nav--locked:hover { background: #fdf1d8; }
 .reader-nav[disabled] { opacity: .3; pointer-events: none; }
-.reader-nav svg { width: 26px; height: 26px; }
+.reader-nav svg { width: 22px; height: 22px; }
 .reader-foot {
-  height: 48px; flex: 0 0 auto; display: flex; align-items: center; gap: 14px;
-  padding: 0 18px; background: var(--surface); border-top: 1px solid var(--border); font-size: 13px; color: var(--text-3);
+  height: 44px; flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
+  padding: 0 16px; background: var(--surface); border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3);
 }
-.page-input { width: 62px; height: 32px; text-align: center; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--surface-2); }
+.page-input { width: 58px; height: 30px; text-align: center; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--surface); }
 .paywall {
   position: absolute; inset: 0; z-index: 5; display: grid; place-items: center;
-  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px);
+  background: rgba(245, 246, 247, .93); backdrop-filter: blur(6px);
   padding: 20px; text-align: center;
 }
+[data-theme="dark"] .paywall { background: rgba(22, 24, 28, .93); }
 .paywall__box { max-width: 420px; }
-.paywall__icon svg { width: 28px; height: 28px; }
-.paywall__box h2 svg { width: 22px; height: 22px; }
+.paywall__icon svg { width: 26px; height: 26px; }
+.paywall__box h2 { font-size: 19px; font-weight: 700; }
 
 /* ------------------------------ Comments -------------------------------- */
+.comment-composer { display: flex; gap: 12px; padding: 14px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface-2); }
+.comment-composer .textarea { background: var(--surface); }
 .comment { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .comment:last-child { border-bottom: 0; }
 .avatar {
-  width: 40px; height: 40px; border-radius: 999px; flex: 0 0 auto;
-  display: grid; place-items: center; font-weight: 700; color: #fff; font-size: 15px;
-  background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
-  overflow: hidden;
+  width: 36px; height: 36px; border-radius: 50%; flex: 0 0 auto;
+  display: grid; place-items: center; font-weight: 600; color: #fff; font-size: 13.5px;
+  background: var(--zoho-blue); overflow: hidden;
 }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
-.avatar--sm { width: 34px; height: 34px; font-size: 13px; }
+.avatar--sm { width: 30px; height: 30px; font-size: 12px; }
 .comment__body { flex: 1; min-width: 0; }
 .comment__head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.comment__name { font-weight: 700; font-size: 13.5px; }
-.comment__time { font-size: 12px; color: var(--text-3); }
-.comment__text { font-size: 14px; color: var(--text-2); margin-top: 4px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-.comment__actions { display: flex; gap: 14px; margin-top: 8px; }
-.link-btn { font-size: 12.5px; font-weight: 600; color: var(--text-3); display: inline-flex; align-items: center; gap: 5px; }
-.link-btn:hover { color: var(--brand-600); }
-.link-btn svg { width: 14px; height: 14px; }
-.link-btn.is-active { color: var(--brand-600); }
+.comment__name { font-weight: 600; font-size: 13px; }
+.comment__time { font-size: 11.5px; color: var(--text-3); }
+.comment__text { font-size: 13.5px; color: var(--text-2); margin-top: 3px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.comment__actions { display: flex; gap: 14px; margin-top: 7px; }
+.link-btn { font-size: 12px; font-weight: 600; color: var(--text-3); display: inline-flex; align-items: center; gap: 5px; }
+.link-btn:hover { color: var(--accent); }
+.link-btn svg { width: 13px; height: 13px; }
+.link-btn.is-active { color: var(--accent); }
 
-/* Rating input */
-.rate-input { display: inline-flex; gap: 4px; }
+.rate-input { display: inline-flex; gap: 3px; }
 .rate-input button { padding: 2px; }
-.rate-input svg { width: 26px; height: 26px; color: var(--border-strong); transition: color .12s var(--ease), transform .12s var(--ease); }
-.rate-input button:hover svg { transform: scale(1.12); }
-.rate-input button.on svg { color: var(--accent-500); }
+.rate-input svg { width: 22px; height: 22px; color: var(--border-strong); transition: color .12s var(--ease), transform .12s var(--ease); }
+.rate-input button:hover svg { transform: scale(1.1); }
+.rate-input button.on svg { color: var(--zoho-yellow); }
 
 /* ------------------------------ Toast ----------------------------------- */
-.toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.toast-wrap { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .toast {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--text); color: var(--bg); padding: 12px 18px;
-  border-radius: var(--radius-pill); font-size: 14px; font-weight: 600;
-  box-shadow: var(--shadow-lg); animation: popIn .2s var(--ease);
+  display: flex; align-items: center; gap: 9px;
+  background: var(--text); color: var(--surface); padding: 10px 16px;
+  border-radius: var(--r); font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg); animation: popIn .16s var(--ease);
 }
-.toast svg { width: 18px; height: 18px; }
-.toast--error { background: var(--danger-500); color: #fff; }
-.toast--success { background: var(--success-500); color: #fff; }
+.toast svg { width: 16px; height: 16px; }
+.toast--error { background: var(--zoho-red); color: #fff; }
+.toast--success { background: var(--zoho-green); color: #fff; }
 
 /* ------------------------------ Dropdown -------------------------------- */
 .menu {
-  position: absolute; right: 0; top: calc(100% + 8px); z-index: 90;
-  min-width: 220px; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow-md); padding: 6px;
-  animation: popIn .16s var(--ease);
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 90;
+  min-width: 230px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-md); padding: 5px;
+  animation: popIn .14s var(--ease);
 }
 .menu__item {
-  display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 10px 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; text-align: left;
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 8px 10px; border-radius: var(--r); font-size: 13.5px; font-weight: 500; text-align: left;
 }
-.menu__item:hover { background: var(--surface-2); }
-.menu__item svg { width: 17px; height: 17px; color: var(--text-3); }
-.menu__item--danger { color: var(--danger-500); }
-.menu__item--danger svg { color: var(--danger-500); }
-.menu__sep { height: 1px; background: var(--border); margin: 6px 4px; }
-.menu__head { padding: 10px 12px; }
-.menu__head b { display: block; font-size: 14px; }
-.menu__head span { font-size: 12.5px; color: var(--text-3); word-break: break-all; }
+.menu__item:hover { background: var(--surface-3); }
+.menu__item svg { width: 16px; height: 16px; color: var(--text-3); }
+.menu__item--danger { color: var(--zoho-red); }
+.menu__item--danger svg { color: var(--zoho-red); }
+.menu__sep { height: 1px; background: var(--border); margin: 5px 4px; }
+.menu__head { padding: 9px 10px; }
+.menu__head b { display: block; font-size: 13.5px; }
+.menu__head span { font-size: 12px; color: var(--text-3); word-break: break-all; }
 
 /* ------------------------------ Footer ---------------------------------- */
-.app-footer { border-top: 1px solid var(--border); background: var(--surface); margin-top: 40px; }
-.app-footer .container { padding-top: 34px; padding-bottom: 34px; }
-.footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 30px; }
+.app-footer { border-top: 1px solid var(--border); background: var(--surface); margin-top: 32px; }
+.app-footer .container { padding-top: 28px; padding-bottom: 28px; }
+.footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 26px; }
 @media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
-.footer-col h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-3); margin-bottom: 12px; }
-.footer-col a { display: block; font-size: 13.5px; color: var(--text-2); padding: 5px 0; }
-.footer-col a:hover { color: var(--brand-600); }
-.footer-bottom { border-top: 1px solid var(--border); margin-top: 28px; padding-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 13px; color: var(--text-3); }
+.footer-col h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-3); margin-bottom: 10px; font-weight: 700; }
+.footer-col a { display: block; font-size: 13px; color: var(--text-2); padding: 4px 0; }
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 12.5px; color: var(--text-3); }
 
 /* ------------------------------ Utility --------------------------------- */
 .muted { color: var(--text-3); }
@@ -571,24 +723,23 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mb-0 { margin-bottom: 0; }
 .text-center { text-align: center; }
 .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.skeleton-block { padding: 60px 0; }
 
-/* Mobile: give the search its own row instead of crushing it */
+/* Mobile: search on its own row */
 @media (max-width: 640px) {
-  .app-header { height: auto; }
-  .app-header .container { height: auto; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; row-gap: 10px; gap: 10px; }
-  .brand { order: 1; }
-  .header-actions { order: 2; margin-left: auto; }
+  .app-topbar { flex-wrap: wrap; height: auto; padding: 9px 14px; row-gap: 9px; }
+  body.has-shell { padding-top: 100px; }
   .search { order: 3; flex: 1 0 100%; max-width: none; }
-  .section-head { flex-wrap: wrap; }
-  .detail { padding-top: 20px; }
-  .hero { padding: 30px 22px 28px; }
-  .hero__stats { gap: 22px; }
-  .container { padding: 0 16px; }
+  .header-actions { margin-left: auto; }
+  .page-head { padding-top: 16px; }
+  .detail { padding-top: 16px; }
+  .hero { padding: 20px 18px; }
+  .container { padding: 0 14px; }
+  .app-sidebar { top: 0; z-index: 120; }
+  .sidebar-scrim { inset: 0; z-index: 115; }
 }
 
 /* Print: hide chrome */
-@media print { .app-header, .app-footer, .reader-bar, .reader-foot, .reader-nav { display: none !important; } }
+@media print { .app-topbar, .app-sidebar, .app-footer, .reader-bar, .reader-foot, .reader-nav { display: none !important; } }
 
 </style>
 <style>
@@ -596,7 +747,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pv-bar {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 9px 24px; font-size: 12.5px; font-weight: 600;
-  background: linear-gradient(90deg, #312e81, #4f46e5 60%, #6366f1);
+  background: linear-gradient(90deg, #a8181a, #e42527 62%, #f0473c);
   color: #fff;
 }
 .pv-bar svg { width: 15px; height: 15px; flex: 0 0 auto; }
@@ -622,7 +773,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   <span class="pv-tag">Preview</span>
   <span>PageUp &mdash; single-file interactive preview</span>
   <span class="pv-spacer"></span>
-  <span class="pv-hint">No server, no Firebase &middot; likes, ratings, comments &amp; unlocks are saved in this browser</span>
+  <span class="pv-hint">No server, no Firebase &middot; likes, ratings, comments &amp; unlocks live in this browser</span>
   <button type="button" id="pvHide">Hide</button>
 </div>
 
@@ -1005,42 +1156,53 @@ const DEMO_CATEGORIES = [
    empty on purpose — the Free/Premium and format badges sit there. */
 const FALLBACK_COVER = (book) =>
   `<div style="width:100%;height:100%;background:${coverGradient(book.title + (book.author || ''))};
-     display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:#fff;position:relative">
-     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.42),transparent 62%)"></div>
-     <div style="position:relative">
-       <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.78;margin-bottom:8px">
+     display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff;position:relative">
+     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.46),transparent 62%)"></div>
+     <div class="cover-fallback__text" style="position:relative">
+       <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.78;margin-bottom:7px">
          ${escapeHtml(book.category || 'General')}
        </div>
-       <div style="font-size:17px;font-weight:800;line-height:1.25">${escapeHtml(book.title || 'Untitled')}</div>
-       <div style="font-size:12.5px;opacity:.85;margin-top:6px">${escapeHtml(book.author || 'Unknown author')}</div>
+       <div style="font-size:16px;font-weight:700;line-height:1.3">${escapeHtml(book.title || 'Untitled')}</div>
+       <div style="font-size:12px;opacity:.85;margin-top:5px">${escapeHtml(book.author || 'Unknown author')}</div>
      </div>
    </div>`;
 
 function bookThumb(book, { lazy = true } = {}) {
+  if (!book.coverUrl) {
+    const wrap = el('div', { html: FALLBACK_COVER(book) });
+    return wrap.firstElementChild;
+  }
   const img = el('img', {
     alt: `Cover of ${book.title || 'book'}`,
     loading: lazy ? 'lazy' : 'eager',
     decoding: 'async',
-    src: book.coverUrl || '',
+    src: book.coverUrl,
   });
   img.addEventListener('error', () => {
     const wrap = el('div', { html: FALLBACK_COVER(book) });
     img.replaceWith(wrap.firstElementChild);
   });
-  if (!book.coverUrl) {
-    const wrap = el('div', { html: FALLBACK_COVER(book) });
-    return wrap.firstElementChild;
-  }
   return img;
 }
 
-function renderBookCard(book, { liked = false, unlocked = false, onLike, onShare } = {}) {
+/**
+ * @param {object} book
+ * @param {object} opts
+ * @param {boolean} opts.liked
+ * @param {boolean} opts.unlocked
+ * @param {(book, btn) => void} opts.onLike
+ * @param {(book) => void} opts.onComment
+ * @param {(book) => void} opts.onShare
+ */
+function renderBookCard(book, { liked = false, unlocked = false, onLike, onComment, onShare } = {}) {
   const rating = book.ratingAvg || 0;
   const format = (book.format || 'pdf').toLowerCase();
   const locked = book.isPremium && !unlocked;
+  const comments = book.commentCount || 0;
 
   const card = el('article', { class: 'card', dataset: { id: book.id } });
 
+  /* ---- cover ---- */
   const thumb = el('a', {
     class: 'card__thumb',
     href: `./book.html?id=${encodeURIComponent(book.id)}`,
@@ -1049,12 +1211,10 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onShare
   thumb.append(bookThumb(book));
 
   const badges = el('div', { class: 'card__badges' });
-  if (book.isPremium) {
-    badges.append(el('span', { class: 'badge badge--premium', html: `${icon('crown')}<span>Premium</span>` }));
-  } else {
-    badges.append(el('span', { class: 'badge badge--free', html: `<span>Free</span>` }));
-  }
-  if (book.isNew) badges.append(el('span', { class: 'badge', html: `<span>New</span>` }));
+  badges.append(book.isPremium
+    ? el('span', { class: 'badge badge--premium', html: `${icon('crown')}<span>Premium</span>` })
+    : el('span', { class: 'badge badge--free', html: '<span>Free</span>' }));
+  if (book.isNew) badges.append(el('span', { class: 'badge', html: '<span>New</span>' }));
   thumb.append(badges);
 
   thumb.append(el('div', {
@@ -1062,53 +1222,64 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onShare
     html: `<span class="badge badge--${format}">${format.toUpperCase()}</span>`,
   }));
 
+  /* ---- hover overlay ---- */
   const overlay = el('div', { class: 'card__overlay' });
-  if (book.description) {
-    overlay.append(el('p', { text: book.description }));
-  }
-  const actions = el('div', { class: 'card__overlay-actions' });
+  if (book.description) overlay.append(el('p', { text: book.description }));
+
+  const actions = el('div', { class: 'card__overlay-actions card__overlay-actions--stacked' });
 
   const readBtn = el('a', {
     class: 'overlay-btn overlay-btn--primary',
     href: `./book.html?id=${encodeURIComponent(book.id)}`,
-  }, [el('span', { html: locked ? icon('lock') : icon('play') }), el('span', { text: locked ? 'Preview' : 'Read' })]);
+  }, [el('span', { html: locked ? icon('lock') : icon('play') }), el('span', { text: locked ? 'Read free preview' : 'Read now' })]);
+
+  const row = el('div', { class: 'overlay-row' });
 
   const likeBtn = el('button', {
     class: 'overlay-btn', type: 'button', 'aria-pressed': String(liked),
     title: liked ? 'Remove from likes' : 'Like this book',
   }, [el('span', { html: liked ? icon('heartF') : icon('heart') }), el('span', { class: 'js-like-count', text: formatCount(book.likes || 0) })]);
-
   likeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onLike?.(book, likeBtn); });
+
+  const commentBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Comments' },
+    [el('span', { html: icon('comment') }), el('span', { class: 'js-comment-count', text: formatCount(comments) })]);
+  commentBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onComment?.(book); });
 
   const shareBtn = el('button', { class: 'overlay-btn', type: 'button', title: 'Share' },
     [el('span', { html: icon('share') })]);
   shareBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onShare?.(book); });
 
-  actions.append(readBtn, likeBtn, shareBtn);
+  row.append(likeBtn, commentBtn, shareBtn);
+  actions.append(readBtn, row);
   overlay.append(actions);
   thumb.append(overlay);
   card.append(thumb);
 
+  /* ---- meta ---- */
   const body = el('div', { class: 'card__body' });
-  const meta = el('div', { class: 'card__meta' });
-  meta.append(el('a', {
+  const titleWrap = el('div');
+  titleWrap.append(el('a', {
     class: 'card__title', href: `./book.html?id=${encodeURIComponent(book.id)}`,
     text: book.title || 'Untitled', title: book.title || '',
   }));
-  meta.append(el('div', { class: 'card__author', text: book.author || 'Unknown author' }));
+  titleWrap.append(el('div', { class: 'card__author', text: book.author || 'Unknown author' }));
+  body.append(titleWrap);
 
   const stats = el('div', { class: 'card__stats' });
   if (rating > 0) {
     stats.append(el('span', { class: 'row gap-8', html: `${starRow(rating)}<span class="rating-num">${rating.toFixed(1)}</span>` }));
-    stats.append(el('span', { text: `(${formatCount(book.ratingCount || 0)})` }));
-  } else {
-    stats.append(el('span', { text: 'Not yet rated' }));
   }
   stats.append(el('span', { class: 'row gap-8', html: `${icon('eye')}<span>${formatCount(book.views || 0)}</span>` }));
-  if (book.pages) stats.append(el('span', { text: `${book.pages} pp` }));
-  meta.append(stats);
 
-  body.append(meta);
+  const footerComment = el('button', {
+    class: 'card__comment', type: 'button',
+    title: comments ? `${comments} comment${comments === 1 ? '' : 's'}` : 'Be the first to comment',
+    html: `${icon('comment')}<span class="js-comment-count">${formatCount(comments)}</span>`,
+  });
+  footerComment.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); onComment?.(book); });
+  stats.append(footerComment);
+
+  body.append(stats);
   card.append(body);
   return card;
 }
@@ -1116,8 +1287,8 @@ function renderBookCard(book, { liked = false, unlocked = false, onLike, onShare
 function skeletonCard() {
   return el('div', { class: 'skel-card' }, [
     el('div', { class: 'skel skel-thumb' }),
-    el('div', { class: 'skel skel-line', style: 'width:88%' }),
-    el('div', { class: 'skel skel-line', style: 'width:52%' }),
+    el('div', { class: 'skel skel-line', style: 'width:70%' }),
+    el('div', { class: 'skel skel-line', style: 'width:44%' }),
   ]);
 }
 
@@ -1126,18 +1297,16 @@ function skeletonCard() {
 /* ==========================================================================
    PageUp — single-file preview controller
    Classic script (no modules, no network) so the page runs straight from
-   file:// by double-clicking. Uses the exact same stylesheet and card
-   component as the real app; only the data layer is swapped for localStorage.
+   file:// by double-clicking. Uses the exact same stylesheet, card component
+   and Zoho shell as the real app; only the data layer is localStorage.
    ========================================================================== */
 (function () {
   'use strict';
 
   var LS_KEY = 'pageup:preview:state';
 
-  /* small helpers that live in ui.js in the full app */
-  function money(amount) {
-    return '\u20B9' + (Number(amount) || 0).toLocaleString('en-IN');
-  }
+  /* helpers that live in ui.js in the full app */
+  function money(amount) { return '\u20B9' + (Number(amount) || 0).toLocaleString('en-IN'); }
   function compact(n) {
     n = Number(n) || 0;
     if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
@@ -1146,63 +1315,76 @@ function skeletonCard() {
   }
 
   /* ------------------------------------------------------------ state ---- */
-  var blank = function () {
-    return { likes: {}, ratings: {}, comments: {}, purchases: {}, progress: {}, theme: null };
-  };
+  function blank() {
+    return { likes: {}, ratings: {}, comments: {}, commentLikes: {}, purchases: {}, progress: {}, theme: null };
+  }
   var state = blank();
   try {
     var raw = localStorage.getItem(LS_KEY);
     if (raw) state = Object.assign(blank(), JSON.parse(raw));
   } catch (e) { /* private mode — run in memory */ }
-
-  function save() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
-  }
+  function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {} }
 
   var GUEST = 'guest';
   var sort = 'trending';
   var category = 'all';
   var search = '';
-
   var VIEW = document.getElementById('view');
-  var CATEGORIES = [];
 
   /* ------------------------------------------------------- demo helpers -- */
   function bookById(id) {
     for (var i = 0; i < DEMO_BOOKS.length; i++) if (DEMO_BOOKS[i].id === id) return DEMO_BOOKS[i];
     return null;
   }
-
   function likesOf(id) { return state.likes[id] || (state.likes[id] = {}); }
   function ratingsOf(id) { return state.ratings[id] || (state.ratings[id] = {}); }
   function purchasesOf(id) { return state.purchases[id] || (state.purchases[id] = {}); }
 
-  /** A book merged with this browser's local interactions. */
+  function SEED_COMMENTS() {
+    return [
+      { name: 'Ananya Rao', text: 'Finished this in two sittings. The pacing in the middle chapters is superb.', likes: 24, hours: 30 },
+      { name: 'Vikram Shah', text: 'The annotations in this edition really help if you are reading it for the first time.', likes: 11, hours: 74 },
+      { name: 'Priya Menon', text: 'Read it on the train every morning. Highly recommend the EPUB version for the typography.', likes: 6, hours: 210 }
+    ];
+  }
+  function commentLikesFor(bookId, commentId) {
+    return Object.keys((state.commentLikes || {})[bookId + ':' + commentId] || {}).length;
+  }
+  function commentsOf(bookId) {
+    var mine = (state.comments[bookId] || []).map(function (c) {
+      return Object.assign({}, c, { createdAt: new Date(c.createdAt) });
+    });
+    var seed = SEED_COMMENTS().map(function (c, i) {
+      return { id: 'seed-' + i, name: c.name, text: c.text, likes: c.likes,
+               createdAt: new Date(Date.now() - c.hours * 3600 * 1000), seeded: true };
+    });
+    return mine.concat(seed)
+      .map(function (c) { return Object.assign({}, c, { likes: (c.likes || 0) + commentLikesFor(bookId, c.id) }); })
+      .sort(function (a, b) { return b.createdAt - a.createdAt; });
+  }
+
   function view(id) {
     var b = bookById(id);
     if (!b) return null;
     var r = ratingsOf(id);
     var values = Object.keys(r).map(function (k) { return r[k]; });
-    var extra = values.reduce(function (a, v) { return a + v; }, 0);
     var count = (b.ratingCount || 0) + values.length;
-    var sum = (b.ratingSum || 0) + extra;
-    var liked = Object.keys(likesOf(id)).length;
+    var sum = (b.ratingSum || 0) + values.reduce(function (a, v) { return a + v; }, 0);
     return Object.assign({}, b, {
-      likes: (b.likes || 0) + liked,
+      likes: (b.likes || 0) + Object.keys(likesOf(id)).length,
+      commentCount: commentsOf(id).length,
       ratingSum: sum,
       ratingCount: count,
       ratingAvg: count ? +(sum / count).toFixed(2) : 0,
       liked: !!likesOf(id)[GUEST],
       myRating: r[GUEST] || 0,
-      unlocked: !b.isPremium || !!purchasesOf(id)[GUEST],
+      unlocked: !b.isPremium || !!purchasesOf(id)[GUEST]
     });
   }
 
   function catalogue() {
     var items = DEMO_BOOKS.map(function (b) { return view(b.id); });
-    if (category !== 'all') {
-      items = items.filter(function (b) { return b.category.toLowerCase() === category.toLowerCase(); });
-    }
+    if (category !== 'all') items = items.filter(function (b) { return b.category.toLowerCase() === category.toLowerCase(); });
     if (search) {
       var q = search.toLowerCase();
       items = items.filter(function (b) {
@@ -1227,80 +1409,147 @@ function skeletonCard() {
     return Object.keys(seen).sort(function (a, b) { return seen[b] - seen[a]; });
   }
 
-  var SEED_COMMENTS = [
-    { name: 'Ananya Rao', text: 'Finished this in two sittings. The pacing in the middle chapters is superb.', likes: 24, hours: 30 },
-    { name: 'Vikram Shah', text: 'The annotations in this edition really help if you are reading it for the first time.', likes: 11, hours: 74 },
-    { name: 'Priya Menon', text: 'Read it on the train every morning. Highly recommend the EPUB version for the typography.', likes: 6, hours: 210 }
+  /* -------------------------------------------------------------- shell -- */
+  var NAV = [
+    { label: 'Browse', items: [
+      { id: 'discover', label: 'Discover', icon: 'grid', href: '#/' },
+      { id: 'trending', label: 'Trending', icon: 'flame', href: '#/?sort=trending' },
+      { id: 'newest',   label: 'New releases', icon: 'book', href: '#/?sort=newest' },
+      { id: 'rated',    label: 'Top rated', icon: 'star', href: '#/?sort=rating' },
+      { id: 'popular',  label: 'Most read', icon: 'eye', href: '#/?sort=views' }
+    ] },
+    { label: 'My books', items: [
+      { id: 'library',  label: 'My library', icon: 'bookmark', href: '#/library' },
+      { id: 'liked',    label: 'Liked', icon: 'heart', href: '#/library/liked' },
+      { id: 'continue', label: 'Continue reading', icon: 'play', href: '#/library/continue' }
+    ] }
   ];
 
-  function commentsOf(id) {
-    var mine = (state.comments[id] || []).map(function (c) {
-      return Object.assign({}, c, { createdAt: new Date(c.createdAt) });
-    });
-    var seed = SEED_COMMENTS.map(function (c, i) {
-      return {
-        id: 'seed-' + i, name: c.name, text: c.text, likes: c.likes,
-        createdAt: new Date(Date.now() - c.hours * 3600 * 1000), seeded: true
-      };
-    });
-    return mine.concat(seed).sort(function (a, b) { return b.createdAt - a.createdAt; });
+  function activeId() {
+    var r = route();
+    if (r.name === 'library') return r.panel || 'library';
+    if (r.name === 'detail') return null;
+    return { trending: 'trending', newest: 'newest', rating: 'rated', views: 'popular' }[sort] || 'discover';
   }
 
-  /* ------------------------------------------------------------- header -- */
-  function renderHeader() {
+  function renderShell() {
+    document.body.classList.add('has-shell');
     var host = document.getElementById('appHeader');
     host.innerHTML =
-      '<header class="app-header"><div class="container">' +
+      '<header class="app-topbar">' +
+        '<button class="icon-btn app-topbar__burger" id="navBurger" aria-label="Open navigation">' + icon('list') + '</button>' +
         '<a class="brand" href="#/" aria-label="PageUp home">' +
           '<span class="brand__mark">' + icon('book') + '</span>' +
           '<span class="brand__name">Page<span>Up</span></span>' +
         '</a>' +
+        '<span class="brand__divider"></span>' +
+        '<span class="brand__product">Reading Platform</span>' +
         '<form class="search" id="searchForm" role="search">' +
           '<span class="search__icon">' + icon('search') + '</span>' +
           '<input class="search__input" id="searchInput" type="search" placeholder="Search books, authors, topics..." aria-label="Search books" autocomplete="off" value="' + escapeHtml(search) + '">' +
           '<button class="search__clear' + (search ? '' : ' hidden') + '" id="searchClear" type="button" aria-label="Clear search">' + icon('close') + '</button>' +
         '</form>' +
         '<div class="header-actions">' +
-          '<button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme"></button>' +
-          '<button class="btn btn--ghost btn--sm" id="navSignIn" type="button">' + icon('user') + '<span>Sign in</span></button>' +
+          '<button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><span data-theme-icon></span></button>' +
+          '<button class="btn btn--primary btn--sm" id="navSignIn" type="button">Sign in</button>' +
         '</div>' +
-      '</div></header>';
+      '</header>' +
+      '<aside class="app-sidebar" id="appSidebar">' +
+        '<nav id="sidebarNav" aria-label="Main"></nav>' +
+        '<div class="sidebar-foot" id="planSlot"></div>' +
+      '</aside>' +
+      '<div class="sidebar-scrim" id="sidebarScrim"></div>';
 
     applyTheme();
+    paintSidebar();
 
-    $('#themeToggle').addEventListener('click', function () {
+    document.getElementById('themeToggle').addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       applyTheme(next); state.theme = next; save();
     });
-    $('#navSignIn').addEventListener('click', previewNotice);
+    document.getElementById('navBurger').addEventListener('click', function () {
+      document.body.classList.toggle('sidebar-open');
+    });
+    document.getElementById('sidebarScrim').addEventListener('click', function () {
+      document.body.classList.remove('sidebar-open');
+    });
+    document.getElementById('navSignIn').addEventListener('click', previewNotice);
 
-    var input = $('#searchInput');
-    var clear = $('#searchClear');
+    var input = document.getElementById('searchInput');
+    var clear = document.getElementById('searchClear');
     var run = debounce(function () {
       search = input.value.trim();
       clear.classList.toggle('hidden', !input.value);
-      if (route().name === 'home') paintHome();
-      else location.hash = '#/';
+      if (route().name === 'home') paintGrid(); else location.hash = '#/';
     }, 260);
     input.addEventListener('input', run);
     clear.addEventListener('click', function () {
       input.value = ''; search = ''; clear.classList.add('hidden'); input.focus();
-      if (route().name === 'home') paintHome(); else location.hash = '#/';
+      if (route().name === 'home') paintGrid(); else location.hash = '#/';
     });
-    $('#searchForm').addEventListener('submit', function (e) { e.preventDefault(); run(); });
+    document.getElementById('searchForm').addEventListener('submit', function (e) { e.preventDefault(); run(); });
+
+    renderPlanCard();
+  }
+
+  function paintSidebar() {
+    var nav = document.getElementById('sidebarNav');
+    if (!nav) return;
+    var current = activeId();
+    nav.innerHTML = '';
+    NAV.forEach(function (group) {
+      var section = el('div', { class: 'nav-section' });
+      section.append(el('div', { class: 'nav-section__label', text: group.label }));
+      group.items.forEach(function (item) {
+        var a = el('a', {
+          class: 'nav-item' + (item.id === current ? ' is-active' : ''),
+          href: item.href,
+          html: icon(item.icon) + '<span>' + escapeHtml(item.label) + '</span>'
+        });
+        a.addEventListener('click', function () { document.body.classList.remove('sidebar-open'); });
+        section.append(a);
+      });
+      nav.append(section);
+    });
+    var cats = el('div', { class: 'nav-section' });
+    cats.append(el('div', { class: 'nav-section__label', text: 'Categories' }));
+    categories().slice(0, 8).forEach(function (c) {
+      var a = el('a', {
+        class: 'nav-item' + (category === c ? ' is-active' : ''),
+        href: '#/?cat=' + encodeURIComponent(c),
+        html: icon('list') + '<span>' + escapeHtml(c) + '</span>'
+      });
+      a.addEventListener('click', function () { document.body.classList.remove('sidebar-open'); });
+      cats.append(a);
+    });
+    nav.append(cats);
+  }
+
+  function renderPlanCard() {
+    var host = document.getElementById('planSlot');
+    if (!host) return;
+    host.innerHTML =
+      '<div class="plan-card">' +
+        '<b>Free plan</b>' +
+        '<p>Read free previews of any book.</p>' +
+        '<button class="btn btn--primary btn--sm btn--block" id="planAction">Go premium</button>' +
+      '</div>';
+    document.getElementById('planAction').addEventListener('click', function () {
+      location.hash = '#/?sort=rating';
+    });
   }
 
   function applyTheme(force) {
     var t = force || state.theme ||
       (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', t);
-    var btn = $('#themeToggle');
-    if (btn) btn.innerHTML = icon(t === 'dark' ? 'sun' : 'moon');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-theme-icon]'), function (n) {
+      n.innerHTML = icon(t === 'dark' ? 'sun' : 'moon');
+    });
   }
 
   function previewNotice() {
-    modal(
-      'Static preview',
+    modal('Static preview',
       '<p class="small muted">This single HTML file is a design and interaction preview. There is no ' +
       'account system here — likes, ratings, comments and unlocks are stored in this browser\'s localStorage only.</p>' +
       '<ul class="small muted" style="line-height:2;margin-top:12px">' +
@@ -1310,100 +1559,106 @@ function skeletonCard() {
         '<li>' + icon('check') + 'Real payments: Razorpay checkout</li>' +
       '</ul>' +
       '<p class="hint" style="margin-top:14px">The full app is in the <b>pageup</b> repository.</p>',
-      'Got it'
-    );
+      'Got it');
   }
 
   /* --------------------------------------------------------------- home -- */
   function renderHome() {
-    var total = DEMO_BOOKS.length;
     var reads = DEMO_BOOKS.reduce(function (a, b) { return a + (b.views || 0); }, 0);
-    var free = DEMO_BOOKS.filter(function (b) { return !b.isPremium; }).length;
+    var comments = DEMO_BOOKS.reduce(function (a, b) { return a + 3; }, 0);
 
     VIEW.innerHTML =
+      '<div class="page-head">' +
+        '<div>' +
+          '<div class="crumbs"><a href="#/">Home</a>' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>' +
+            '<span>Catalogue</span></div>' +
+          '<h1>Discover books</h1>' +
+          '<p id="resultMeta">Every premium title opens with a free preview — no card, no signup wall.</p>' +
+        '</div>' +
+        '<div class="row gap-12">' +
+          '<label class="sr-only" for="sortSelect">Sort books</label>' +
+          '<select class="select" id="sortSelect" style="width:auto">' +
+            '<option value="trending">Trending</option><option value="newest">Newest</option>' +
+            '<option value="rating">Top rated</option><option value="views">Most read</option>' +
+            '<option value="likes">Most liked</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+
       '<section class="hero">' +
         '<span class="hero__eyebrow">Freemium reading, built for India</span>' +
         '<h1>Read unlimited previews. Pay only for the books you love.</h1>' +
-        '<p>PageUp is a modern online reader. Start any book free — no card, no signup wall. ' +
-          'When a story grabs you, unlock it once and keep it for life.</p>' +
+        '<p>Start any book free. When a story grabs you, unlock it once and keep it for life — on every device, in EPUB and PDF.</p>' +
         '<div class="hero__actions">' +
-          '<a class="btn btn--lg" style="background:#fff;color:#312e81" href="#catalogue">' + icon('grid') + '<span>Browse the library</span></a>' +
-          '<a class="btn btn--lg" style="background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)" href="#/book/demo-meditations">' + icon('play') + '<span>Start reading free</span></a>' +
+          '<a class="btn btn--primary btn--lg" href="#catalogue">' + icon('grid') + '<span>Browse the library</span></a>' +
+          '<a class="btn btn--outline btn--lg" href="#/book/demo-meditations">' + icon('play') + '<span>Start reading free</span></a>' +
         '</div>' +
         '<div class="hero__stats">' +
-          '<div class="hero__stat"><b>' + total + '</b><span>Titles in catalogue</span></div>' +
+          '<div class="hero__stat"><b>' + DEMO_BOOKS.length + '</b><span>Titles in catalogue</span></div>' +
           '<div class="hero__stat"><b>' + compact(reads) + '</b><span>Reads on PageUp</span></div>' +
-          '<div class="hero__stat"><b>' + free + '</b><span>Free to read now</span></div>' +
-          '<div class="hero__stat"><b>EPUB + PDF</b><span>Both formats supported</span></div>' +
+          '<div class="hero__stat"><b>' + DEMO_BOOKS.filter(function (b) { return !b.isPremium; }).length + '</b><span>Free to read now</span></div>' +
+          '<div class="hero__stat"><b>' + comments + '</b><span>Reader comments</span></div>' +
         '</div>' +
       '</section>' +
+
       '<section id="catalogue">' +
-        '<div class="section-head" style="margin-top:8px">' +
-          '<div><h2>Explore the catalogue</h2><p id="resultMeta" class="hidden"></p></div>' +
-          '<div class="row gap-12">' +
-            '<label class="sr-only" for="sortSelect">Sort books</label>' +
-            '<select class="select" id="sortSelect" style="width:auto;height:38px">' +
-              '<option value="trending">Trending</option><option value="newest">Newest</option>' +
-              '<option value="rating">Top rated</option><option value="views">Most read</option>' +
-              '<option value="likes">Most liked</option>' +
-            '</select>' +
-          '</div>' +
+        '<div class="filterbar">' +
+          '<span class="hint" style="font-weight:600;color:var(--text-2)">Category</span>' +
+          '<div class="chipbar" id="chipbar" role="group" aria-label="Filter by category"></div>' +
         '</div>' +
-        '<div class="chipbar" id="chipbar" role="group" aria-label="Filter by category"></div>' +
-        '<div class="grid" id="bookGrid" style="margin-top:22px"></div>' +
+        '<div class="grid" id="bookGrid"></div>' +
       '</section>' +
-      '<section style="padding:20px 0 40px">' +
-        '<div class="section-head"><div><h2>How the freemium model works</h2>' +
-        '<p>Simple for readers, sustainable for publishers.</p></div></div>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">' +
-          '<div class="gate" style="margin:0"><h3>1 &middot; Preview anything</h3>' +
-            '<p class="mb-0">Every premium book opens with a free preview — enough pages to know whether it is for you. No payment, no signup.</p></div>' +
-          '<div class="gate" style="margin:0"><h3>2 &middot; Unlock what you love</h3>' +
-            '<p class="mb-0">Pay once per book through UPI, cards or netbanking. The title lands in your library permanently.</p></div>' +
-          '<div class="gate" style="margin:0"><h3>3 &middot; Read anywhere</h3>' +
-            '<p class="mb-0">Streamed EPUB and PDF reading in the browser, with your page position saved across devices.</p></div>' +
+
+      '<section style="padding:8px 0 36px">' +
+        '<div class="page-head" style="padding-top:0"><div>' +
+          '<h1 style="font-size:18px">How the freemium model works</h1>' +
+          '<p>Simple for readers, sustainable for publishers.</p>' +
+        '</div></div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">' +
+          '<div class="panel"><div class="panel__body">' +
+            '<h3 style="font-size:14.5px;margin-bottom:6px">1 &middot; Preview anything</h3>' +
+            '<p class="small muted">Every premium book opens with a free preview — enough pages to know whether it is for you.</p></div></div>' +
+          '<div class="panel"><div class="panel__body">' +
+            '<h3 style="font-size:14.5px;margin-bottom:6px">2 &middot; Unlock what you love</h3>' +
+            '<p class="small muted">Pay once per book through UPI, cards or netbanking. It stays in your library permanently.</p></div></div>' +
+          '<div class="panel"><div class="panel__body">' +
+            '<h3 style="font-size:14.5px;margin-bottom:6px">3 &middot; Read anywhere</h3>' +
+            '<p class="small muted">Streamed EPUB and PDF reading in the browser, with your page saved across devices.</p></div></div>' +
         '</div>' +
       '</section>';
 
-    $('#sortSelect').value = sort;
-    $('#sortSelect').addEventListener('change', function (e) { sort = e.target.value; paintHome(); });
-
-    CATEGORIES = categories();
+    var sel = document.getElementById('sortSelect');
+    sel.value = sort;
+    sel.addEventListener('change', function (e) { sort = e.target.value; paintChips(); paintGrid(); paintSidebar(); });
     paintChips();
     paintGrid();
   }
 
   function paintChips() {
-    var host = $('#chipbar');
+    var host = document.getElementById('chipbar');
     if (!host) return;
     host.innerHTML = '';
-    var list = [{ name: 'all', label: 'All books' }].concat(CATEGORIES.map(function (c) { return { name: c, label: c }; }));
+    var list = [{ name: 'all', label: 'All books' }].concat(categories().map(function (c) { return { name: c, label: c }; }));
     list.forEach(function (c) {
       var btn = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(category === c.name), text: c.label });
-      btn.addEventListener('click', function () { category = c.name; paintChips(); paintGrid(); });
+      btn.addEventListener('click', function () { category = c.name; paintChips(); paintGrid(); paintSidebar(); });
       host.append(btn);
     });
   }
 
-  function paintHome() {
-    CATEGORIES = categories();
-    paintChips();
-    paintGrid();
-  }
-
   function paintGrid() {
-    var grid = $('#bookGrid');
+    var grid = document.getElementById('bookGrid');
     if (!grid) return;
     grid.innerHTML = '';
     var items = catalogue();
 
-    var meta = $('#resultMeta');
+    var meta = document.getElementById('resultMeta');
     if (meta) {
       var bits = [items.length + ' book' + (items.length === 1 ? '' : 's')];
       if (search) bits.push('for \u201C' + search + '\u201D');
       if (category !== 'all') bits.push('in ' + category);
       meta.textContent = bits.join(' ');
-      meta.classList.toggle('hidden', items.length === 0 && !search);
     }
 
     if (!items.length) {
@@ -1411,13 +1666,10 @@ function skeletonCard() {
         '<h3>No books matched</h3><p>Try a different search term or clear the category filter.</p>' }));
       return;
     }
-
     items.forEach(function (book) {
       grid.append(renderBookCard(book, {
-        liked: book.liked,
-        unlocked: book.unlocked,
-        onLike: onLike,
-        onShare: onShare
+        liked: book.liked, unlocked: book.unlocked,
+        onLike: onLike, onComment: function (b) { openCommentsDrawer(b); }, onShare: onShare
       }));
     });
   }
@@ -1428,21 +1680,28 @@ function skeletonCard() {
     if (!b) {
       VIEW.innerHTML = '<div class="empty" style="padding:120px 20px">' + icon('book') +
         '<h3>Book not available</h3><p>This title is not in the preview catalogue.</p>' +
-        '<a class="btn btn--primary mt-16" href="#/">Back to the library</a></div>';
+        '<a class="btn btn--primary mt-16" href="#/">Back to the catalogue</a></div>';
       return;
     }
     document.title = b.title + ' \u2014 PageUp';
-
     var locked = b.isPremium && !b.unlocked;
     var rating = b.ratingAvg || 0;
 
     VIEW.innerHTML =
+      '<div class="page-head" style="padding-bottom:6px"><div>' +
+        '<div class="crumbs"><a href="#/">Catalogue</a>' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>' +
+          '<span>' + escapeHtml(b.category) + '</span></div>' +
+      '</div>' +
+      '<div class="row gap-12">' +
+        '<button class="btn btn--ghost btn--sm" id="headShare">' + icon('share') + '<span>Share</span></button>' +
+        '<button class="btn btn--ghost btn--sm" id="headComments">' + icon('comment') + '<span>Comments</span></button>' +
+      '</div></div>' +
+
       '<div class="detail">' +
+        '<div><div class="detail__cover" id="coverBox"></div></div>' +
         '<div>' +
-          '<div class="detail__cover" id="coverBox"></div>' +
-        '</div>' +
-        '<div>' +
-          '<div class="row gap-8" style="flex-wrap:wrap;margin-bottom:14px">' +
+          '<div class="row gap-8" style="flex-wrap:wrap;margin-bottom:12px">' +
             '<span class="badge badge--' + b.format + '">' + b.format.toUpperCase() + '</span>' +
             (b.isPremium
               ? '<span class="badge badge--premium">' + icon('crown') + '<span>Premium</span></span>'
@@ -1462,45 +1721,55 @@ function skeletonCard() {
             '<div><dt>Published</dt><dd>' + escapeHtml(String(b.publishedYear)) + '</dd></div>' +
             '<div><dt>Category</dt><dd>' + escapeHtml(b.category) + '</dd></div>' +
           '</dl>' +
-          '<div class="tabs" role="tablist">' +
-            '<button class="tab" role="tab" aria-selected="true" data-tab="about">About</button>' +
-            '<button class="tab" role="tab" aria-selected="false" data-tab="comments">Comments <span id="tabCommentCount"></span></button>' +
-          '</div>' +
-          '<section id="tab-about">' +
-            '<p class="detail__desc">' + escapeHtml(b.description) + '</p>' +
-            '<div class="row gap-8" style="flex-wrap:wrap">' +
-              (b.tags || []).map(function (t) { return '<span class="chip" style="pointer-events:none">' + escapeHtml(t) + '</span>'; }).join('') +
-            '</div>' +
-            '<div class="mt-24"><h3 style="font-size:15px;margin-bottom:8px">Free sample</h3>' +
-              '<div class="gate" style="margin:0"><p style="font-family:var(--font-read);font-size:16px;line-height:1.8;margin:0;white-space:pre-wrap">' +
-                escapeHtml((b.textContent || '').slice(0, 320)) + '\u2026</p></div>' +
+
+          '<section class="panel" style="margin-bottom:22px">' +
+            '<div class="panel__head">' + icon('info') +
+              '<div><h3>About this book</h3></div></div>' +
+            '<div class="panel__body">' +
+              '<p class="detail__desc" style="margin-top:0">' + escapeHtml(b.description) + '</p>' +
+              '<div class="row gap-8" style="flex-wrap:wrap">' +
+                (b.tags || []).map(function (t) { return '<span class="chip" style="pointer-events:none">' + escapeHtml(t) + '</span>'; }).join('') +
+              '</div>' +
             '</div>' +
           '</section>' +
-          '<section id="tab-comments" class="hidden"></section>' +
+
+          '<section class="panel" style="margin-bottom:22px">' +
+            '<div class="panel__head">' + icon('star') +
+              '<div><h3>Rate this book</h3><p id="ratingSub"></p></div></div>' +
+            '<div class="panel__body row gap-16" style="flex-wrap:wrap">' +
+              '<div class="rate-input" id="rateInput" role="radiogroup" aria-label="Your rating"></div>' +
+              '<span class="hint" id="ratingHint">Tap a star to rate</span>' +
+            '</div>' +
+          '</section>' +
+
+          '<div id="commentsHost"></div>' +
         '</div>' +
       '</div>';
 
-    $('#coverBox').append(bookThumb(b, { lazy: false }));
+    document.getElementById('coverBox').append(bookThumb(b, { lazy: false }));
+    document.getElementById('headShare').addEventListener('click', function () { onShare(b); });
+    document.getElementById('headComments').addEventListener('click', function () { openCommentsDrawer(b); });
+
     paintStats(b, rating);
     paintActions(b, locked);
-    wireTabs(b);
+    paintRating(b);
+    mountCommentsSection(b);
   }
 
   function paintStats(b, rating) {
-    var host = $('#statRow');
+    var host = document.getElementById('statRow');
     if (!host) return;
     host.innerHTML =
       '<div class="detail__stat"><b class="row gap-8">' + (rating ? rating.toFixed(1) : '\u2014') +
-        ' <span style="font-size:13px">' + starRow(rating) + '</span></b>' +
+        ' <span style="font-size:12px">' + starRow(rating) + '</span></b>' +
         '<span>' + formatCount(b.ratingCount) + ' ratings</span></div>' +
       '<div class="detail__stat"><b>' + formatCount(b.views) + '</b><span>reads</span></div>' +
       '<div class="detail__stat"><b id="likeStatNum">' + formatCount(b.likes) + '</b><span>likes</span></div>' +
-      '<div class="detail__stat"><b>' + (b.pages || '\u2014') + '</b><span>pages</span></div>';
+      '<div class="detail__stat"><b id="commentStatNum">' + formatCount(b.commentCount) + '</b><span>comments</span></div>';
   }
 
   function paintActions(b, locked) {
-    var row = $('#actionRow');
-    if (!row) return;
+    var row = document.getElementById('actionRow');
     row.innerHTML = '';
 
     var read = el('button', { class: 'btn btn--primary btn--lg' }, [
@@ -1509,18 +1778,27 @@ function skeletonCard() {
     ]);
     read.addEventListener('click', function () { openReader(b.id); });
 
-    var like = el('button', { class: 'btn btn--outline btn--lg', 'aria-pressed': String(b.liked) }, [
+    var like = el('button', { class: 'btn btn--ghost btn--lg', 'aria-pressed': String(b.liked) }, [
       el('span', { html: b.liked ? icon('heartF') : icon('heart') }),
       el('span', { text: b.liked ? 'Liked' : 'Like' })
     ]);
     like.addEventListener('click', function () { onLike(b, like); });
+
+    var comment = el('button', { class: 'btn btn--ghost btn--lg' }, [
+      el('span', { html: icon('comment') }), el('span', { text: 'Add a comment' })
+    ]);
+    comment.addEventListener('click', function () {
+      var host = document.getElementById('commentsHost');
+      if (host) host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(function () { var t = host && host.querySelector('textarea'); if (t) t.focus(); }, 420);
+    });
 
     var share = el('button', { class: 'btn btn--ghost btn--lg' }, [
       el('span', { html: icon('share') }), el('span', { text: 'Share' })
     ]);
     share.addEventListener('click', function () { onShare(b); });
 
-    row.append(read, like, share);
+    row.append(read, like, comment, share);
 
     if (locked) {
       var unlock = el('button', { class: 'btn btn--gold btn--lg' }, [
@@ -1531,8 +1809,7 @@ function skeletonCard() {
       row.append(unlock);
     }
 
-    /* premium gate block */
-    var gate = $('#gateBox');
+    var gate = document.getElementById('gateBox');
     gate.innerHTML = '';
     if (b.isPremium && !b.unlocked) {
       gate.innerHTML =
@@ -1541,108 +1818,126 @@ function skeletonCard() {
         'one-time, yours forever, no subscription.</p>' +
         '<div class="row gap-8" style="flex-wrap:wrap">' +
           '<button class="btn btn--gold" id="gateUnlock">' + icon('crown') + '<span>Unlock full book</span></button>' +
-          '<button class="btn btn--outline" id="gatePreview">' + icon('eye') + '<span>Continue free preview</span></button>' +
+          '<button class="btn btn--ghost" id="gatePreview">' + icon('eye') + '<span>Continue free preview</span></button>' +
         '</div></div>';
-      $('#gateUnlock').addEventListener('click', function () { openUnlock(b.id); });
-      $('#gatePreview').addEventListener('click', function () { openReader(b.id); });
+      document.getElementById('gateUnlock').addEventListener('click', function () { openUnlock(b.id); });
+      document.getElementById('gatePreview').addEventListener('click', function () { openReader(b.id); });
     }
   }
 
-  function wireTabs(b) {
-    var tabs = document.querySelectorAll('.tab');
-    Array.prototype.forEach.call(tabs, function (tab) {
-      tab.addEventListener('click', function () {
-        Array.prototype.forEach.call(tabs, function (t) {
-          t.setAttribute('aria-selected', String(t === tab));
+  /* ------------------------------------------------------------- rating -- */
+  function paintRating(b) {
+    var input = document.getElementById('rateInput');
+    if (!input) return;
+    input.innerHTML = '';
+    var current = b.myRating || 0;
+    for (var i = 1; i <= 5; i++) {
+      (function (value) {
+        var btn = el('button', {
+          type: 'button', class: value <= current ? 'on' : '', role: 'radio',
+          'aria-label': value + ' star' + (value > 1 ? 's' : ''), 'aria-checked': String(value === current),
+          html: icon('star')
         });
-        var target = tab.getAttribute('data-tab');
-        $('#tab-about').classList.toggle('hidden', target !== 'about');
-        $('#tab-comments').classList.toggle('hidden', target !== 'comments');
-        if (target === 'comments') renderComments(b.id);
-      });
-    });
-    var count = document.getElementById('tabCommentCount');
-    if (count) {
-      var n = commentsOf(b.id).length;
-      count.textContent = n ? '(' + n + ')' : '';
+        btn.addEventListener('click', function () { rate(b.id, value); });
+        btn.addEventListener('mouseenter', function () { paintStars(value); });
+        input.append(btn);
+      })(i);
     }
+    input.addEventListener('mouseleave', function () { paintStars(current); });
+
+    var sub = document.getElementById('ratingSub');
+    if (sub) sub.textContent = b.ratingCount
+      ? (b.ratingAvg || 0).toFixed(1) + ' average from ' + formatCount(b.ratingCount) + ' ratings'
+      : 'No ratings yet';
+    var hint = document.getElementById('ratingHint');
+    if (hint) hint.textContent = current ? 'You rated this ' + current + '/5' : 'Tap a star to rate';
+  }
+  function paintStars(upto) {
+    Array.prototype.forEach.call(document.querySelectorAll('#rateInput button'), function (btn, idx) {
+      btn.classList.toggle('on', idx < upto);
+    });
+  }
+  function rate(bookId, value) {
+    ratingsOf(bookId)[GUEST] = value;
+    save();
+    var b = view(bookId);
+    paintStars(value);
+    var hint = document.getElementById('ratingHint');
+    if (hint) hint.textContent = 'You rated this ' + value + '/5';
+    var sub = document.getElementById('ratingSub');
+    if (sub) sub.textContent = (b.ratingAvg || 0).toFixed(1) + ' average from ' + formatCount(b.ratingCount) + ' ratings';
+    toast('Rated ' + value + ' out of 5', 'success');
   }
 
   /* ----------------------------------------------------------- comments -- */
-  function renderComments(bookId) {
-    var host = $('#tab-comments');
-    if (!host) return;
-    host.innerHTML =
-      '<div class="stack gap-16">' +
-        '<div class="row gap-12">' +
-          '<div class="avatar">G</div>' +
-          '<div style="flex:1">' +
-            '<textarea class="textarea" id="commentInput" rows="3" placeholder="Share what you thought of this book..."></textarea>' +
-            '<div class="row gap-8 mt-8"><span class="hint" id="commentCount"></span><span class="spacer"></span>' +
-            '<button class="btn btn--primary btn--sm" id="commentSubmit">Post comment</button></div>' +
-          '</div>' +
-        '</div>' +
-        '<div id="commentList"></div>' +
-      '</div>';
+  function composerNode(book, compact) {
+    var node = el('div', { class: compact ? 'row gap-12' : 'comment-composer' });
+    node.append(el('div', { class: 'avatar', text: 'GR' }));
 
-    $('#commentSubmit').addEventListener('click', function () {
-      var input = $('#commentInput');
+    var field = el('div', { style: 'flex:1;min-width:0' });
+    var input = el('textarea', {
+      class: 'textarea', rows: compact ? '2' : '3',
+      placeholder: 'Write a review or ask a question about this book...',
+      'aria-label': 'Write a comment'
+    });
+    var bar = el('div', { class: 'row gap-8 mt-8' }, [
+      el('span', { class: 'hint', text: 'Be kind. Reviews are public.' }),
+      el('span', { class: 'spacer' })
+    ]);
+    var submit = el('button', { class: 'btn btn--primary btn--sm', type: 'button' },
+      [el('span', { html: icon('comment') }), el('span', { text: 'Post comment' })]);
+    bar.append(submit);
+    field.append(input, bar);
+
+    submit.addEventListener('click', function () {
       var text = input.value.trim();
-      if (!text) { toast('Write something first', 'info'); return; }
-      var list = state.comments[bookId] || (state.comments[bookId] = []);
+      if (!text) { toast('Write something first', 'info'); input.focus(); return; }
+      var list = state.comments[book.id] || (state.comments[book.id] = []);
       list.unshift({
         id: 'c-' + Date.now(), name: 'Guest reader', text: text.slice(0, 2000),
         likes: 0, createdAt: new Date().toISOString()
       });
       save();
       input.value = '';
-      renderComments(bookId);
+      refreshComments(book.id);
       toast('Comment posted', 'success');
     });
 
-    var items = commentsOf(bookId);
-    var listHost = $('#commentList');
-    var cc = $('#commentCount');
-    if (cc) cc.textContent = items.length + ' comment' + (items.length === 1 ? '' : 's');
-
-    if (!items.length) {
-      listHost.innerHTML = '<p class="muted small text-center" style="padding:30px 0">No comments yet \u2014 be the first.</p>';
-      return;
-    }
-    items.forEach(function (c) { listHost.append(renderComment(bookId, c)); });
+    node.append(field);
+    return node;
   }
 
-  function renderComment(bookId, c) {
+  function commentNode(book, c) {
     var node = el('div', { class: 'comment' });
     node.append(el('div', { class: 'avatar', text: initials(c.name) }));
 
     var body = el('div', { class: 'comment__body' });
-    body.append(el('div', { class: 'comment__head' }, [
+    var head = el('div', { class: 'comment__head' }, [
       el('span', { class: 'comment__name', text: c.name }),
       el('span', { class: 'comment__time', text: timeAgo(c.createdAt) })
-    ]));
+    ]);
+    body.append(head);
     body.append(el('div', { class: 'comment__text', text: c.text }));
 
     var actions = el('div', { class: 'comment__actions' });
-    var likeBtn = el('button', { class: 'link-btn', type: 'button', html: icon('heart') + '<span>' + (c.likes || 0) + '</span>' });
+    var likeBtn = el('button', { class: 'link-btn', type: 'button',
+      html: icon('heart') + '<span>' + (c.likes || 0) + '</span>' });
     likeBtn.addEventListener('click', function () {
-      c.likes = (c.likes || 0) + 1;
-      if (!c.seeded) {
-        var mine = (state.comments[bookId] || []).filter(function (x) { return x.id === c.id; })[0];
-        if (mine) mine.likes = c.likes;
-        save();
-      }
-      likeBtn.innerHTML = icon('heart') + '<span>' + c.likes + '</span>';
-      likeBtn.classList.add('is-active');
+      state.commentLikes = state.commentLikes || {};
+      var key = book.id + ':' + c.id;
+      var set = state.commentLikes[key] = state.commentLikes[key] || {};
+      if (set[GUEST]) delete set[GUEST]; else set[GUEST] = true;
+      save();
+      refreshComments(book.id);
     });
     actions.append(likeBtn);
 
     if (!c.seeded) {
       var del = el('button', { class: 'link-btn', type: 'button', html: icon('trash') + '<span>Delete</span>' });
       del.addEventListener('click', function () {
-        state.comments[bookId] = (state.comments[bookId] || []).filter(function (x) { return x.id !== c.id; });
+        state.comments[book.id] = (state.comments[book.id] || []).filter(function (x) { return x.id !== c.id; });
         save();
-        renderComments(bookId);
+        refreshComments(book.id);
         toast('Comment deleted', 'info');
       });
       actions.append(del);
@@ -1653,6 +1948,106 @@ function skeletonCard() {
     return node;
   }
 
+  function commentList(items, book) {
+    var wrap = el('div');
+    if (!items.length) {
+      wrap.append(el('p', { class: 'muted small text-center', style: 'padding:32px 0',
+        text: 'No comments yet — be the first to share your thoughts.' }));
+      return wrap;
+    }
+    items.forEach(function (c) { wrap.append(commentNode(book, c)); });
+    return wrap;
+  }
+
+  /* A tiny registry so every mounted comments view refreshes on any change. */
+  var commentsViews = [];
+
+  function refreshComments(bookId) {
+    commentsViews.forEach(function (v) {
+      if (v.bookId !== bookId) return;
+      v.paint();
+    });
+  }
+
+  function mountCommentsSection(book) {
+    var host = document.getElementById('commentsHost');
+    if (!host) return;
+    host.innerHTML = '';
+
+    var panel = el('section', { class: 'panel' });
+    panel.append(el('div', { class: 'panel__head' }, [
+      el('span', { html: icon('comment') }),
+      el('div', {}, [el('h3', { text: 'Comments & reviews' }), el('p', { id: 'commentSub' })])
+    ]));
+    var body = el('div', { class: 'panel__body' });
+    var list = el('div', { class: 'mt-16' });
+    body.append(composerNode(book, false), list);
+    panel.append(body);
+    host.append(panel);
+
+    var entry = {
+      bookId: book.id,
+      paint: function () {
+        var items = commentsOf(book.id);
+        var sub = document.getElementById('commentSub');
+        if (sub) sub.textContent = items.length
+          ? items.length + ' comment' + (items.length === 1 ? '' : 's')
+          : 'Be the first to comment';
+        list.innerHTML = '';
+        list.append(commentList(items, book));
+        var stat = document.getElementById('commentStatNum');
+        if (stat) stat.textContent = formatCount(items.length);
+      }
+    };
+    commentsViews.push(entry);
+    entry.paint();
+  }
+
+  function openCommentsDrawer(book) {
+    closeDrawer();
+    var scrim = el('div', { class: 'overlay', style: 'place-items:stretch;padding:0;background:rgba(16,20,26,.42)' });
+    var drawer = el('div', { class: 'drawer', role: 'dialog', 'aria-modal': 'true' });
+
+    var head = el('div', { class: 'drawer__head' });
+    head.append(
+      el('span', { html: icon('comment') }),
+      el('div', { style: 'flex:1;min-width:0' }, [el('h3', { text: 'Comments' }), el('p', { class: 'clamp-2', text: book.title })]),
+      el('button', { class: 'icon-btn', id: 'drawerClose', 'aria-label': 'Close comments', html: icon('close') })
+    );
+    var body = el('div', { class: 'drawer__body' });
+    var foot = el('div', { class: 'drawer__foot' });
+    drawer.append(head, body, foot);
+    scrim.append(drawer);
+    document.body.append(scrim);
+
+    var entry = {
+      bookId: book.id,
+      paint: function () {
+        var items = commentsOf(book.id);
+        body.innerHTML = '';
+        body.append(commentList(items, book));
+        head.querySelector('h3').textContent = items.length ? 'Comments (' + items.length + ')' : 'Comments';
+      }
+    };
+    commentsViews.push(entry);
+    entry.paint();
+    foot.append(composerNode(book, true));
+
+    var close = function () {
+      commentsViews = commentsViews.filter(function (v) { return v !== entry; });
+      scrim.remove();
+      document.removeEventListener('keydown', onKey);
+      refreshComments(book.id);
+    };
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    head.querySelector('#drawerClose').addEventListener('click', close);
+    scrim.addEventListener('click', function (e) { if (e.target === scrim) close(); });
+    document.addEventListener('keydown', onKey);
+    activeDrawer = close;
+  }
+  var activeDrawer = null;
+  function closeDrawer() { if (activeDrawer) { var c = activeDrawer; activeDrawer = null; c(); } }
+
   /* -------------------------------------------------------------- likes -- */
   function onLike(book, btn) {
     var map = likesOf(book.id);
@@ -1662,14 +2057,13 @@ function skeletonCard() {
 
     if (btn) {
       btn.setAttribute('aria-pressed', String(now));
-      var first = btn.firstElementChild;
-      if (first) first.innerHTML = now ? icon('heartF') : icon('heart');
+      if (btn.firstElementChild) btn.firstElementChild.innerHTML = now ? icon('heartF') : icon('heart');
       var counter = btn.querySelector('.js-like-count');
       if (counter) counter.textContent = formatCount(Math.max(0, (book.likes || 0) + (now ? 1 : -1)));
     }
     if (route().name === 'detail') {
       var fresh = view(book.id);
-      var stat = $('#likeStatNum');
+      var stat = document.getElementById('likeStatNum');
       if (stat) stat.textContent = formatCount(fresh.likes);
       var likeBtn = document.querySelector('#actionRow button[aria-pressed]');
       if (likeBtn) {
@@ -1696,13 +2090,13 @@ function skeletonCard() {
     var b = view(id);
     modal('Unlock \u201C' + b.title + '\u201D',
       '<p class="small muted">One-time purchase. Read it forever on every device.</p>' +
-      '<div class="meta-list" style="grid-template-columns:1fr 1fr;margin-top:16px">' +
+      '<div class="meta-list" style="grid-template-columns:1fr 1fr;margin:16px 0">' +
         '<div><dt>Price</dt><dd>' + money(b.price) + '</dd></div>' +
         '<div><dt>Access</dt><dd>Lifetime</dd></div>' +
         '<div><dt>Format</dt><dd>' + b.format.toUpperCase() + '</dd></div>' +
         '<div><dt>Devices</dt><dd>Unlimited</dd></div>' +
       '</div>' +
-      '<ul class="small muted" style="line-height:2;margin-top:8px">' +
+      '<ul class="small muted" style="line-height:2">' +
         '<li>' + icon('check') + 'Full book, no page limits</li>' +
         '<li>' + icon('check') + 'Read online, resume where you left off</li>' +
         '<li>' + icon('check') + 'Offline reading in the PageUp app</li>' +
@@ -1750,6 +2144,7 @@ function skeletonCard() {
         '<div style="min-width:0"><div class="reader-bar__title">' + escapeHtml(b.title) + '</div>' +
         '<div class="reader-bar__sub" id="readerSub"></div></div>' +
         '<span class="spacer"></span>' +
+        '<button class="btn btn--ghost btn--sm" id="readerComments">' + icon('comment') + '<span>Comments</span></button>' +
         '<button class="icon-btn" id="readerZoomOut" aria-label="Zoom out">' + icon('zoomOut') + '</button>' +
         '<button class="icon-btn" id="readerZoomIn" aria-label="Zoom in">' + icon('zoomIn') + '</button>' +
         '<button class="icon-btn" id="readerFull" aria-label="Toggle fullscreen">' + icon('grid') + '</button>' +
@@ -1763,16 +2158,16 @@ function skeletonCard() {
       '<div class="reader-foot"><span>Page</span>' +
         '<input class="page-input" id="readerPageInput" type="number" min="1" value="' + page + '" aria-label="Go to page">' +
         '<span id="readerTotal">of ' + total + '</span><span class="spacer"></span>' +
+        '<button class="link-btn" id="footComments">' + icon('comment') + '<span>Comments</span></button>' +
         '<span id="readerPercent">0%</span></div>' });
 
     document.body.append(shell);
     document.body.style.overflow = 'hidden';
-    var stage = $('#readerStage');
+    var stage = document.getElementById('readerStage');
 
     stage.innerHTML = '<div style="max-width:720px;margin:0 auto;padding:36px 24px 80px">' +
       '<div id="textPage" style="font-family:var(--font-read);font-size:19px;line-height:1.85;color:var(--text)"></div></div>';
-    var textPage = $('#textPage');
-
+    var textPage = document.getElementById('textPage');
     var atLimit = false;
 
     function paint() {
@@ -1783,16 +2178,16 @@ function skeletonCard() {
 
       var percent = Math.round((page / total) * 100);
       atLimit = !b.unlocked && page >= limit;
-      $('#readerBar').style.width = percent + '%';
-      $('#readerPercent').textContent = atLimit ? 'Preview ended' : percent + '%';
-      $('#readerTotal').textContent = 'of ' + total;
-      var input = $('#readerPageInput');
+      document.getElementById('readerBar').style.width = percent + '%';
+      document.getElementById('readerPercent').textContent = atLimit ? 'Preview ended' : percent + '%';
+      document.getElementById('readerTotal').textContent = 'of ' + total;
+      var input = document.getElementById('readerPageInput');
       if (document.activeElement !== input) input.value = page;
-      $('#readerPrev').disabled = page <= 1;
-      $('#readerNext').disabled = b.unlocked && page >= total;
-      $('#readerNext').innerHTML = icon(atLimit ? 'lock' : 'right');
-      $('#readerNext').classList.toggle('reader-nav--locked', atLimit);
-      $('#readerSub').textContent = b.unlocked
+      document.getElementById('readerPrev').disabled = page <= 1;
+      document.getElementById('readerNext').disabled = b.unlocked && page >= total;
+      document.getElementById('readerNext').innerHTML = icon(atLimit ? 'lock' : 'right');
+      document.getElementById('readerNext').classList.toggle('reader-nav--locked', atLimit);
+      document.getElementById('readerSub').textContent = b.unlocked
         ? (b.author + ' \u00b7 preview reader')
         : (atLimit ? 'End of free sample' : 'Free sample');
       state.progress[id] = page;
@@ -1800,54 +2195,54 @@ function skeletonCard() {
     }
     paint();
 
-    function close() {
-      shell.remove();
-      document.body.style.overflow = '';
-      reader = null;
-    }
+    function close() { shell.remove(); document.body.style.overflow = ''; reader = null; }
     reader = { close: close };
 
-    $('#readerBack').addEventListener('click', close);
-    $('#readerPrev').addEventListener('click', function () { if (page > 1) { page--; paint(); } });
-    $('#readerNext').addEventListener('click', function () {
+    document.getElementById('readerBack').addEventListener('click', close);
+    document.getElementById('readerPrev').addEventListener('click', function () { if (page > 1) { page--; paint(); } });
+    document.getElementById('readerNext').addEventListener('click', function () {
       if (atLimit) { paywall(); return; }
       if (page < limit) { page++; paint(); }
       else if (!b.unlocked) paywall();
     });
-    $('#readerZoomIn').addEventListener('click', function () {
+    document.getElementById('readerZoomIn').addEventListener('click', function () {
       textPage.style.fontSize = Math.min(30, parseFloat(getComputedStyle(textPage).fontSize) + 2) + 'px';
     });
-    $('#readerZoomOut').addEventListener('click', function () {
+    document.getElementById('readerZoomOut').addEventListener('click', function () {
       textPage.style.fontSize = Math.max(14, parseFloat(getComputedStyle(textPage).fontSize) - 2) + 'px';
     });
-    $('#readerPageInput').addEventListener('change', function (e) {
-      var n = Math.min(limit, Math.max(1, Math.round(Number(e.target.value) || 1)));
-      page = n; paint();
+    document.getElementById('readerPageInput').addEventListener('change', function (e) {
+      page = Math.min(limit, Math.max(1, Math.round(Number(e.target.value) || 1)));
+      paint();
     });
-    $('#readerFull').addEventListener('click', function () {
+    document.getElementById('readerFull').addEventListener('click', function () {
       if (document.fullscreenElement) document.exitFullscreen();
       else if (shell.requestFullscreen) shell.requestFullscreen().catch(function () {});
     });
     document.addEventListener('keydown', function onKey(e) {
       if (!document.getElementById('readerShell')) { document.removeEventListener('keydown', onKey); return; }
       if (e.key === 'Escape') close();
-      if (e.key === 'ArrowRight') $('#readerNext').click();
-      if (e.key === 'ArrowLeft') $('#readerPrev').click();
+      if (e.key === 'ArrowRight') document.getElementById('readerNext').click();
+      if (e.key === 'ArrowLeft') document.getElementById('readerPrev').click();
     });
 
+    var openComments = function () { openCommentsDrawer(b); };
+    document.getElementById('readerComments').addEventListener('click', openComments);
+    document.getElementById('footComments').addEventListener('click', openComments);
+
     function paywall() {
-      if ($('#paywallOverlay')) return;
+      if (document.getElementById('paywallOverlay')) return;
       var overlay = el('div', { class: 'paywall', id: 'paywallOverlay', html:
         '<div class="paywall__box">' +
-          '<div class="paywall__icon" style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#f97316);display:grid;place-items:center;margin:0 auto 16px;color:#fff">' + icon('crown') + '</div>' +
-          '<h2 style="font-size:22px">You have reached the free preview</h2>' +
+          '<div class="paywall__icon" style="width:52px;height:52px;border-radius:var(--r-lg);background:var(--zoho-yellow);display:grid;place-items:center;margin:0 auto 14px;color:#3d2c00">' + icon('crown') + '</div>' +
+          '<h2>You have reached the free preview</h2>' +
           '<p class="muted mt-8">Unlock \u201C' + escapeHtml(b.title) + '\u201D to keep reading \u2014 one payment, yours for life.</p>' +
           '<div class="row gap-8 mt-24" style="justify-content:center;flex-wrap:wrap">' +
             '<button class="btn btn--gold btn--lg" id="paywallUnlock">' + icon('crown') + '<span>Unlock for ' + money(b.price) + '</span></button>' +
-            '<button class="btn btn--outline btn--lg" id="paywallClose">Keep browsing</button>' +
+            '<button class="btn btn--ghost btn--lg" id="paywallClose">Keep browsing</button>' +
           '</div>' +
         '</div>' });
-      $('.reader-main').append(overlay);
+      document.querySelector('.reader-main').append(overlay);
       overlay.querySelector('#paywallUnlock').addEventListener('click', function () {
         overlay.remove(); close(); openUnlock(id);
       });
@@ -1855,7 +2250,7 @@ function skeletonCard() {
     }
   }
 
-  /* -------------------------------------------------------------- modal -- */
+  /* --------------------------------------------------------------- modal -- */
   var modalEl = null;
   function modal(title, bodyHtml, okLabel, onMount) {
     closeModal();
@@ -1863,8 +2258,9 @@ function skeletonCard() {
       '<div class="modal" role="dialog" aria-modal="true">' +
         '<div class="modal__head"><div style="flex:1"><h3>' + escapeHtml(title) + '</h3></div>' +
         '<button class="icon-btn" data-close aria-label="Close">' + icon('close') + '</button></div>' +
-        '<div data-body>' + bodyHtml + '</div>' +
+        '<div class="modal__body">' + bodyHtml +
         (okLabel ? '<button class="btn btn--primary btn--block btn--lg mt-16" data-close>' + escapeHtml(okLabel) + '</button>' : '') +
+        '</div>' +
       '</div>' });
     document.body.append(modalEl);
     modalEl.addEventListener('click', function (e) {
@@ -1878,26 +2274,120 @@ function skeletonCard() {
   /* -------------------------------------------------------------- router -- */
   function route() {
     var h = location.hash || '#/';
-    var m = h.match(/^#\/book\/(.+)$/);
+    var m = h.match(/^#\/book\/([^?]+)/);
     if (m) return { name: 'detail', id: decodeURIComponent(m[1]) };
+    var lib = h.match(/^#\/library(?:\/(\w+))?/);
+    if (lib) return { name: 'library', panel: lib[1] || 'continue' };
+
+    var q = (h.split('?')[1] || '');
+    var params = {};
+    q.split('&').filter(Boolean).forEach(function (kv) {
+      var parts = kv.split('=');
+      params[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1] || '');
+    });
+    if (params.cat) category = params.cat;
+    if (params.sort) sort = params.sort;
     return { name: 'home' };
   }
 
   function render() {
     var r = route();
     closeModal();
+    closeDrawer();
     if (reader) reader.close();
-    if (r.name === 'detail') {
-      renderDetail(r.id);
-      window.scrollTo(0, 0);
-    } else {
-      document.title = 'PageUp \u2014 Read unlimited. Pay only for what you love.';
-      renderHome();
-    }
+    commentsViews = [];
+    if (r.name === 'detail') { renderDetail(r.id); window.scrollTo(0, 0); }
+    else if (r.name === 'library') { renderLibrary(r.panel); window.scrollTo(0, 0); }
+    else { document.title = 'PageUp \u2014 Read unlimited. Pay only for what you love.'; renderHome(); }
+    paintSidebar();
   }
 
+  /* ------------------------------------------------------------ library -- */
+  var PANELS = ['continue', 'liked', 'owned'];
+
+  function renderLibrary(panel) {
+    if (!PANELS.includes(panel)) panel = 'continue';
+    document.title = 'My library \u2014 PageUp';
+
+    VIEW.innerHTML =
+      '<div class="page-head"><div>' +
+        '<div class="crumbs"><a href="#/">Home</a>' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>' +
+          '<span>My library</span></div>' +
+        '<h1>My library</h1><p>Everything you have liked, unlocked or started reading.</p>' +
+      '</div></div>' +
+      '<div class="tabs" role="tablist">' +
+        PANELS.map(function (p) {
+          var labels = { continue: 'Continue reading', liked: 'Liked', owned: 'Unlocked' };
+          return '<button class="tab" role="tab" data-panel="' + p + '" aria-selected="' + (p === panel) + '">' +
+            '<span>' + labels[p] + '</span><span class="js-tab-count"></span></button>';
+        }).join('') +
+      '</div>' +
+      PANELS.map(function (p) {
+        return '<div id="panel-' + p + '" class="' + (p === panel ? '' : 'hidden') + '">' +
+          '<div class="grid" id="grid-' + p + '"></div></div>';
+      }).join('');
+
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
+      tab.addEventListener('click', function () {
+        location.hash = '#/library/' + tab.getAttribute('data-panel');
+      });
+    });
+    paintLibrary();
+  }
+
+  function paintLibrary() {
+    var cards = DEMO_BOOKS.map(function (b) { return view(b.id); });
+    var liked = cards.filter(function (b) { return b.liked; });
+    var owned = cards.filter(function (b) { return b.isPremium && b.unlocked; });
+    var progress = Object.keys(state.progress || {}).map(function (id) {
+      var b = bookById(id);
+      return b ? { book: view(id), page: state.progress[id] } : null;
+    }).filter(Boolean);
+
+    var sets = { continue: progress, liked: liked, owned: owned };
+    PANELS.forEach(function (p) {
+      var grid = document.getElementById('grid-' + p);
+      if (!grid) return;
+      grid.innerHTML = '';
+      var rows = sets[p];
+      var count = document.querySelector('.tab[data-panel="' + p + '"] .js-tab-count');
+      if (count) count.textContent = rows.length ? '(' + rows.length + ')' : '';
+      if (!rows.length) {
+        var msgs = {
+          continue: ['Nothing in progress', 'Open any book and PageUp will remember where you stopped.'],
+          liked: ['No likes yet', 'Tap the heart on any book to keep it here.'],
+          owned: ['No premium unlocks yet', 'Unlock a premium title and it appears here forever.']
+        };
+        grid.append(el('div', { class: 'empty', html: icon('bookmark') +
+          '<h3>' + msgs[p][0] + '</h3><p>' + msgs[p][1] + '</p>' +
+          '<a class="btn btn--primary mt-16" href="#/">Browse the catalogue</a>' }));
+        return;
+      }
+      rows.forEach(function (row) {
+        var b = p === 'continue' ? row.book : row;
+        var card = renderBookCard(b, {
+          liked: b.liked, unlocked: true,
+          onLike: onLike, onComment: function (x) { openCommentsDrawer(x); }, onShare: onShare
+        });
+        if (p === 'continue') {
+          var total = b.pages || 100;
+          var pct = Math.min(99, Math.round((row.page / total) * 100));
+          card.querySelector('.card__body').append(el('div', { style: 'margin-top:8px;padding-top:8px;border-top:1px solid var(--border)' }, [
+            el('div', { style: 'height:4px;background:var(--surface-3);border-radius:99px;overflow:hidden' }, [
+              el('div', { style: 'height:100%;width:' + pct + '%;background:var(--accent)' })
+            ]),
+            el('div', { class: 'hint', style: 'margin-top:5px', text: 'Page ' + row.page + ' of ' + total + ' \u00b7 ' + pct + '%' })
+          ]));
+        }
+        grid.append(card);
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------------- boot -- */
   window.addEventListener('hashchange', render);
-  renderHeader();
+  renderShell();
   render();
 })();
 

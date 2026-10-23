@@ -47,7 +47,12 @@ export async function listBooks(opts = {}) {
   const { sort = 'trending', category = 'all', search = '', pageSize = 24, page = 0 } = opts;
   let items = DEMO_BOOKS.map((b) => {
     const local = state.books[b.id] || {};
-    return { ...b, ...local, likes: (b.likes || 0) + (local.likesDelta || 0), ...aggFrom(b.id, b) };
+    return {
+      ...b, ...local,
+      likes: (b.likes || 0) + (local.likesDelta || 0),
+      commentCount: demoCommentCount(b.id),
+      ...aggFrom(b.id, b),
+    };
   });
   if (category && category !== 'all') {
     items = items.filter((b) => b.category.toLowerCase() === category.toLowerCase());
@@ -65,6 +70,11 @@ export async function listBooks(opts = {}) {
   return { items: items.slice(start, start + pageSize), cursor: null, hasMore: start + pageSize < items.length };
 }
 
+/* Three seeded sample comments per title, plus anything posted locally. */
+function demoCommentCount(bookId) {
+  return 3 + (state.comments[bookId] || []).length;
+}
+
 function aggFrom(bookId, base) {
   const r = state.ratings[bookId] || {};
   const values = Object.values(r);
@@ -79,7 +89,12 @@ export async function getBook(id) {
   const base = DEMO_BOOKS.find((b) => b.id === id);
   if (!base) return null;
   const local = state.books[id] || {};
-  return { ...base, ...local, likes: (base.likes || 0) + (local.likesDelta || 0), ...aggFrom(id, base) };
+  return {
+    ...base, ...local,
+    likes: (base.likes || 0) + (local.likesDelta || 0),
+    commentCount: demoCommentCount(id),
+    ...aggFrom(id, base),
+  };
 }
 
 export function subscribeBook(id, cb) {
@@ -145,14 +160,36 @@ export async function rateBook(bookId, uid, value) {
 
 /* -------------------------------------------------------------- Comments */
 
+/* Demo mode has no Firestore snapshots, so keep a tiny pub/sub of our own:
+   every mutation below re-emits to whoever is listening for that book. */
+const commentSubs = new Map();
+
+function commentLikesFor(bookId, commentId) {
+  return Object.keys((state.commentLikes || {})[`${bookId}:${commentId}`] || {}).length;
+}
+
+function demoComments(bookId) {
+  const userComments = state.comments[bookId] || [];
+  return [...userComments.map((c) => ({ ...c, createdAt: new Date(c.createdAt) })),
+          ...seedComments(bookId)]
+    .map((c) => ({ ...c, likes: (c.likes || 0) + commentLikesFor(bookId, c.id) }))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
+function emitComments(bookId) {
+  const subs = commentSubs.get(bookId);
+  if (!subs || !subs.size) return;
+  const all = demoComments(bookId);
+  subs.forEach((cb) => { try { cb(all); } catch (e) { console.error(e); } });
+}
+
 export function subscribeComments(bookId, cb) {
   if (!DEMO) return data.subscribeComments(bookId, cb);
-  const userComments = state.comments[bookId] || [];
-  const all = [...userComments.map((c) => ({ ...c, createdAt: new Date(c.createdAt) })),
-               ...seedComments(bookId)]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  cb(all);
-  return () => {};
+  let subs = commentSubs.get(bookId);
+  if (!subs) { subs = new Set(); commentSubs.set(bookId, subs); }
+  subs.add(cb);
+  cb(demoComments(bookId));
+  return () => { subs.delete(cb); if (!subs.size) commentSubs.delete(bookId); };
 }
 
 export async function addComment(bookId, user, text) {
@@ -168,6 +205,7 @@ export async function addComment(bookId, user, text) {
   };
   list.unshift(item);
   save();
+  emitComments(bookId);
   return item;
 }
 
@@ -175,21 +213,17 @@ export async function deleteComment(bookId, commentId) {
   if (!DEMO) return data.deleteComment(bookId, commentId);
   state.comments[bookId] = (state.comments[bookId] || []).filter((c) => c.id !== commentId);
   save();
+  emitComments(bookId);
 }
 
 export async function toggleCommentLike(bookId, commentId, uid) {
   if (!DEMO) return data.toggleCommentLike(bookId, commentId, uid);
-  const key = `${bookId}:${commentId}`;
   state.commentLikes = state.commentLikes || {};
+  const key = `${bookId}:${commentId}`;
   const set = state.commentLikes[key] = state.commentLikes[key] || {};
-  set[uid] = !set[uid];
-  if (!set[uid]) delete set[uid];
-  const seedIdx = Number(String(commentId).split('-').pop());
-  const seeded = String(commentId).startsWith('seed-') ? seedComments(bookId)[seedIdx] : null;
-  const mine = (state.comments[bookId] || []).find((c) => c.id === commentId);
-  const target = seeded || mine;
-  if (target) target.likes = (target.likes || 0) + (set[uid] ? 1 : -1);
+  if (set[uid]) delete set[uid]; else set[uid] = true;
   save();
+  emitComments(bookId);
   return !!set[uid];
 }
 

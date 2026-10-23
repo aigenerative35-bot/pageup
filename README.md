@@ -13,12 +13,13 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 | YouTube-style responsive book grid with thumbnails, badges and hover overlay | `index.html`, `assets/js/cards.js` |
 | Search, category chips, five sort orders, infinite scroll | `assets/js/app.js` |
 | 5-star rating (one vote per reader, aggregate kept in a transaction) | `assets/js/data.js` |
-| Comments with like + delete, live via Firestore snapshots | `assets/js/book.js` |
+| Comments everywhere: a count + button on every card, an always-visible review panel on the book page, and a slide-over drawer from the reader | `assets/js/comments.js` |
 | Like button + share (Web Share API with clipboard fallback) | `assets/js/cards.js`, `assets/js/ui.js` |
 | Online reader — **EPUB** (epub.js), **PDF** (pdf.js), plus a text fallback | `assets/js/reader.js` |
 | Freemium gating: free preview pages, unlock modal, paywall at the limit | `assets/js/book.js` |
 | Auth: Google + email/password, password reset, persistent session | `assets/js/ui.js` |
 | My Library: continue reading, liked, unlocked | `library.html` |
+| Zoho-style design language: #E42527 accent, top bar + left nav rail, flat panels on a grey canvas | `assets/css/styles.css`, `assets/js/ui.js` |
 | Light / dark theme, offline-first Firestore cache | `assets/css/styles.css`, `assets/js/firebase.js` |
 | Security rules for Firestore and Storage | `firestore.rules`, `storage.rules` |
 | Sample catalogue seeder (Admin SDK) | `seed/` |
@@ -26,6 +27,19 @@ Built as a static site (HTML + CSS + vanilla ES modules) on **Firebase** (Auth, 
 | One-file interactive preview (no server, no Firebase) | `preview.html` |
 
 **Preview mode.** Until you paste a real Firebase config, the site runs entirely offline against the bundled public-domain catalogue in `assets/js/demo-data.js`. Every screen works — likes, ratings, comments and previews persist in `localStorage` — so you can review the product before touching Firebase.
+
+---
+
+## Design language
+
+The UI follows Zoho's visual system: the brand red `#E42527` as the accent, a
+fixed top bar with a left navigation rail, flat white panels on a light grey
+canvas, 6-8px corner radii, hairline `#e4e6e8` borders, and an 8pt spacing
+grid. Zoho's secondary brand colours are used for meaning — green `#089949`
+for free/unlocked, blue `#226DB4` for EPUB, yellow `#F9B21D` for premium.
+
+All of it lives in design tokens at the top of `assets/css/styles.css`, so
+re-theming is a matter of editing that one block.
 
 ---
 
@@ -227,7 +241,8 @@ Book is paid  →  first `previewPages` pages               → unlock with one 
 │       ├── data.js              # Firestore reads/writes
 │       ├── store.js             # facade: Firestore  or  offline demo
 │       ├── demo-data.js         # public-domain sample catalogue
-│       ├── ui.js                # header, theme, auth modal, share, toasts
+│       ├── ui.js                # shell (top bar + sidebar), theme, auth, share
+│       ├── comments.js          # shared composer, list, drawer
 │       ├── cards.js             # book card component
 │       ├── reader.js            # pdf.js + epub.js + text engine
 │       ├── app.js               # home page controller

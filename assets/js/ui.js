@@ -1,4 +1,4 @@
-/* PageUp — shared shell: header, theme, auth modal, session, share */
+/* PageUp — app shell: top bar, left navigation rail, theme, auth, share */
 import {
   signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword,
   signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail,
@@ -15,8 +15,7 @@ export function applyTheme(theme) {
     (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem(THEME_KEY, t);
-  const btn = $('#themeToggle');
-  if (btn) btn.innerHTML = icon(t === 'dark' ? 'sun' : 'moon');
+  $$('[data-theme-icon]').forEach((n) => { n.innerHTML = icon(t === 'dark' ? 'sun' : 'moon'); });
   return t;
 }
 export function toggleTheme() {
@@ -24,14 +23,13 @@ export function toggleTheme() {
 }
 
 /* -------------------------------------------------------------- Session */
-export const session = { user: null, profile: null };
+export const session = { user: null, profile: null, ready: false };
 const listeners = new Set();
-export function onSession(cb) { listeners.add(cb); if (session.user !== null || session.ready) cb(session); return () => listeners.delete(cb); }
+export function onSession(cb) { listeners.add(cb); if (session.ready) cb(session); return () => listeners.delete(cb); }
 function emit() { listeners.forEach((cb) => { try { cb(session); } catch (e) { console.error(e); } }); }
 
 let profileUnsub = null;
 export function initAuth() {
-  /* Preview mode: no Firebase project yet, so run as a local guest. */
   if (!isConfigured) {
     session.user = null; session.profile = null; session.ready = true;
     return Promise.resolve(session);
@@ -42,48 +40,97 @@ export function initAuth() {
       if (profileUnsub) { profileUnsub(); profileUnsub = null; }
       if (user) {
         try { session.profile = await ensureUserProfile(user); } catch { session.profile = null; }
-        profileUnsub = subscribeProfile(user.uid, (p) => { if (p) { session.profile = p; emit(); renderHeaderAuth(); } });
+        profileUnsub = subscribeProfile(user.uid, (p) => {
+          if (p) { session.profile = p; emit(); renderShellAuth(); renderPlanCard(); }
+        });
       } else {
         session.profile = null;
       }
       session.ready = true;
-      renderHeaderAuth();
+      renderShellAuth();
+      renderPlanCard();
       emit();
       resolve(session);
     });
   });
 }
 
-/* --------------------------------------------------------------- Header */
-export function renderHeader() {
+/* ---------------------------------------------------------------- Shell */
+const NAV = [
+  {
+    label: 'Browse',
+    items: [
+      { id: 'discover', label: 'Discover', icon: 'grid', href: './index.html' },
+      { id: 'trending', label: 'Trending', icon: 'flame', href: './index.html?sort=trending' },
+      { id: 'newest',   label: 'New releases', icon: 'book', href: './index.html?sort=newest' },
+      { id: 'rated',    label: 'Top rated', icon: 'star', href: './index.html?sort=rating' },
+      { id: 'popular',  label: 'Most read', icon: 'eye', href: './index.html?sort=views' },
+    ],
+  },
+  {
+    label: 'My books',
+    items: [
+      { id: 'library',  label: 'My library', icon: 'bookmark', href: './library.html' },
+      { id: 'liked',    label: 'Liked', icon: 'heart', href: './library.html#liked' },
+      { id: 'continue', label: 'Continue reading', icon: 'play', href: './library.html#continue' },
+    ],
+  },
+];
+
+function activeId() {
+  const path = location.pathname.split('/').pop() || 'index.html';
+  if (path === 'library.html') {
+    const h = location.hash.replace('#', '');
+    return h || 'library';
+  }
+  if (path !== 'index.html' && path !== '') return null;
+  const sort = new URLSearchParams(location.search).get('sort');
+  return { trending: 'trending', newest: 'newest', rating: 'rated', views: 'popular' }[sort] || 'discover';
+}
+
+export function renderShell() {
   const host = $('#appHeader');
   if (!host) return;
+  document.body.classList.add('has-shell');
+  const current = activeId();
+
   host.innerHTML = `
-    <header class="app-header">
-      <div class="container">
-        <a class="brand" href="./index.html" aria-label="PageUp home">
-          <span class="brand__mark">${icon('book')}</span>
-          <span class="brand__name">Page<span>Up</span></span>
-        </a>
+    <header class="app-topbar">
+      <button class="icon-btn app-topbar__burger" id="navBurger" aria-label="Open navigation">${icon('list')}</button>
+      <a class="brand" href="./index.html" aria-label="PageUp home">
+        <span class="brand__mark">${icon('book')}</span>
+        <span class="brand__name">Page<span>Up</span></span>
+      </a>
+      <span class="brand__divider"></span>
+      <span class="brand__product">Reading Platform</span>
 
-        <form class="search" id="searchForm" role="search">
-          <span class="search__icon">${icon('search')}</span>
-          <input class="search__input" id="searchInput" type="search"
-                 placeholder="Search books, authors, topics..." aria-label="Search books" autocomplete="off">
-          <button class="search__clear hidden" id="searchClear" type="button" aria-label="Clear search">${icon('close')}</button>
-        </form>
+      <form class="search" id="searchForm" role="search">
+        <span class="search__icon">${icon('search')}</span>
+        <input class="search__input" id="searchInput" type="search"
+               placeholder="Search books, authors, topics..." aria-label="Search books" autocomplete="off">
+        <button class="search__clear hidden" id="searchClear" type="button" aria-label="Clear search">${icon('close')}</button>
+      </form>
 
-        <div class="header-actions">
-          <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme"></button>
-          <a class="btn btn--ghost btn--sm hidden" id="navLibrary" href="./library.html">${icon('bookmark')}<span>Library</span></a>
-          <button class="btn btn--primary btn--sm" id="navSignIn" type="button">Sign in</button>
-          <div class="hidden" id="userSlot" style="position:relative"></div>
-        </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><span data-theme-icon></span></button>
+        <button class="btn btn--primary btn--sm hidden" id="navSignIn" type="button">Sign in</button>
+        <div class="hidden" id="userSlot" style="position:relative"></div>
       </div>
-    </header>`;
+    </header>
+
+    <aside class="app-sidebar" id="appSidebar">
+      <nav id="sidebarNav" aria-label="Main"></nav>
+      <div class="sidebar-foot" id="planSlot"></div>
+    </aside>
+
+    <div class="sidebar-scrim" id="sidebarScrim"></div>`;
 
   applyTheme();
+  paintSidebar(current);
+
   $('#themeToggle').addEventListener('click', toggleTheme);
+  $('#navBurger').addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
+  $('#sidebarScrim').addEventListener('click', () => document.body.classList.remove('sidebar-open'));
 
   const form = $('#searchForm');
   const input = $('#searchInput');
@@ -102,32 +149,92 @@ export function renderHeader() {
   });
 
   $('#navSignIn').addEventListener('click', () => openAuthModal());
-  renderHeaderAuth();
+  renderShellAuth();
+  renderPlanCard();
+  loadNavCategories();
 }
 
-export function renderHeaderAuth() {
+function paintSidebar(current) {
+  const nav = $('#sidebarNav');
+  if (!nav) return;
+  nav.innerHTML = '';
+  NAV.forEach((group) => {
+    const section = el('div', { class: 'nav-section' });
+    section.append(el('div', { class: 'nav-section__label', text: group.label }));
+    group.items.forEach((item) => {
+      const a = el('a', {
+        class: `nav-item${item.id === current ? ' is-active' : ''}`,
+        href: item.href,
+        html: `${icon(item.icon)}<span>${escapeHtml(item.label)}</span>`,
+      });
+      a.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
+      section.append(a);
+    });
+    nav.append(section);
+  });
+
+  const cats = el('div', { class: 'nav-section', id: 'navCategories' });
+  cats.append(el('div', { class: 'nav-section__label', text: 'Categories' }));
+  nav.append(cats);
+}
+
+async function loadNavCategories() {
+  const host = $('#navCategories');
+  if (!host) return;
+  let cats = [];
+  try {
+    const { getCategories } = await import('./store.js');
+    cats = await getCategories();
+  } catch { return; }
+  if (!cats.length) return;
+  const active = new URLSearchParams(location.search).get('cat');
+  cats.slice(0, 8).forEach((c) => {
+    host.append(el('a', {
+      class: `nav-item${active === c.name ? ' is-active' : ''}`,
+      href: `./index.html?cat=${encodeURIComponent(c.name)}`,
+      html: `${icon('list')}<span>${escapeHtml(c.name)}</span><span class="nav-count">${c.count}</span>`,
+    }));
+  });
+}
+
+function renderPlanCard() {
+  const host = $('#planSlot');
+  if (!host) return;
+  const isPremium = session.profile?.isPremium;
+  host.innerHTML = `
+    <div class="plan-card">
+      <b>${isPremium ? 'Premium member' : 'Free plan'}</b>
+      <p>${isPremium ? 'Unlimited access to every title.' : 'Read free previews of any book.'}</p>
+      <button class="btn ${isPremium ? 'btn--ghost' : 'btn--primary'} btn--sm btn--block" id="planAction">
+        ${isPremium ? 'Manage plan' : 'Go premium'}
+      </button>
+    </div>`;
+  $('#planAction').addEventListener('click', () => {
+    if (isPremium) toast('Subscription management lives in the full app', 'info');
+    else location.href = './index.html?sort=rating';
+  });
+}
+
+export function renderShellAuth() {
   const signIn = $('#navSignIn');
   const slot = $('#userSlot');
-  const lib = $('#navLibrary');
   if (!signIn || !slot) return;
 
   if (!session.user) {
     signIn.classList.remove('hidden');
     slot.classList.add('hidden');
-    lib?.classList.add('hidden');
     slot.innerHTML = '';
     return;
   }
   signIn.classList.add('hidden');
   slot.classList.remove('hidden');
-  lib?.classList.remove('hidden');
 
   const name = session.user.displayName || session.user.email || 'Reader';
   const photo = session.user.photoURL;
   const isPremium = session.profile?.isPremium;
 
   slot.innerHTML = `
-    <button class="icon-btn" id="userBtn" type="button" aria-haspopup="menu" aria-label="Account menu">
+    <button class="icon-btn" id="userBtn" aria-haspopup="menu" aria-label="Account menu">
       <span class="avatar avatar--sm">${photo ? `<img src="${escapeHtml(photo)}" alt="">` : escapeHtml(initials(name))}</span>
     </button>`;
 
@@ -159,10 +266,7 @@ document.addEventListener('click', () => $('.menu')?.remove());
 
 /* ----------------------------------------------------------- Auth modal */
 export function openAuthModal(mode = 'signin') {
-  if (!isConfigured) {
-    openConfigNotice();
-    return;
-  }
+  if (!isConfigured) { openConfigNotice(); return; }
   $('.overlay')?.remove();
   let current = mode;
 
@@ -184,44 +288,39 @@ export function openAuthModal(mode = 'signin') {
         </div>
         <button class="icon-btn" id="authClose" aria-label="Close">${icon('close')}</button>
       </div>
-
-      <button class="btn btn--outline btn--block btn--lg" id="googleBtn">
-        ${icon('google')}<span>Continue with Google</span>
-      </button>
-
-      <div class="divider">or use email</div>
-
-      <form id="authForm">
-        ${isSignup ? `<div class="field"><label for="authName">Full name</label>
-          <input class="input" id="authName" type="text" placeholder="Ada Lovelace" autocomplete="name"></div>` : ''}
-        <div class="field">
-          <label for="authEmail">Email</label>
-          <input class="input" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
-        </div>
-        <div class="field">
-          <label for="authPass">Password</label>
-          <input class="input" id="authPass" type="password" placeholder="At least 6 characters" autocomplete="${isSignup ? 'new-password' : 'current-password'}" required minlength="6">
-        </div>
-        <div class="error-text hidden" id="authError"></div>
-        <button class="btn btn--primary btn--block btn--lg mt-8" id="authSubmit" type="submit">
-          ${isSignup ? 'Create account' : 'Sign in'}
+      <div class="modal__body">
+        <button class="btn btn--ghost btn--block btn--lg" id="googleBtn">
+          ${icon('google')}<span>Continue with Google</span>
         </button>
-      </form>
-
-      <p class="small muted mt-16 text-center">
-        ${isSignup ? 'Already have an account?' : 'New to PageUp?'}
-        <button class="link-btn" id="authSwap" style="font-size:13px">${isSignup ? 'Sign in' : 'Create a free account'}</button>
-      </p>
-      ${!isSignup ? `<p class="small muted mt-8 text-center"><button class="link-btn" id="authReset" style="font-size:13px">Forgot password?</button></p>` : ''}
-    `;
+        <div class="divider">or use email</div>
+        <form id="authForm">
+          ${isSignup ? `<div class="field"><label for="authName">Full name</label>
+            <input class="input" id="authName" type="text" placeholder="Ada Lovelace" autocomplete="name"></div>` : ''}
+          <div class="field">
+            <label for="authEmail">Email</label>
+            <input class="input" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="authPass">Password</label>
+            <input class="input" id="authPass" type="password" placeholder="At least 6 characters" autocomplete="${isSignup ? 'new-password' : 'current-password'}" required minlength="6">
+          </div>
+          <div class="error-text hidden" id="authError"></div>
+          <button class="btn btn--primary btn--block btn--lg mt-8" id="authSubmit" type="submit">
+            ${isSignup ? 'Create account' : 'Sign in'}
+          </button>
+        </form>
+        <p class="small muted mt-16 text-center">
+          ${isSignup ? 'Already have an account?' : 'New to PageUp?'}
+          <button class="link-btn" id="authSwap" style="font-size:13px">${isSignup ? 'Sign in' : 'Create a free account'}</button>
+        </p>
+        ${!isSignup ? `<p class="small muted mt-8 text-center"><button class="link-btn" id="authReset" style="font-size:13px">Forgot password?</button></p>` : ''}
+      </div>`;
 
     modal.querySelector('#authClose').onclick = () => overlay.remove();
     modal.querySelector('#authSwap').onclick = () => { current = isSignup ? 'signin' : 'signup'; paint(); };
     modal.querySelector('#googleBtn').onclick = async () => {
-      try {
-        await signInWithPopup(auth, googleProvider);
-        overlay.remove(); toast('Signed in', 'success');
-      } catch (err) { showErr(err); }
+      try { await signInWithPopup(auth, googleProvider); overlay.remove(); toast('Signed in', 'success'); }
+      catch (err) { showErr(err); }
     };
     modal.querySelector('#authReset')?.addEventListener('click', async () => {
       const email = modal.querySelector('#authEmail').value.trim();
@@ -285,21 +384,20 @@ function openConfigNotice() {
   const overlay = el('div', { class: 'overlay', html: `
     <div class="modal modal--wide" role="dialog" aria-modal="true">
       <div class="modal__head">
-        <div style="flex:1">
-          <h3>Connect your Firebase project</h3>
-          <p>PageUp is running in preview mode.</p>
-        </div>
+        <div style="flex:1"><h3>Connect your Firebase project</h3><p>PageUp is running in preview mode.</p></div>
         <button class="icon-btn" id="cfgClose" aria-label="Close">${icon('close')}</button>
       </div>
-      <p class="small muted">Open <code>assets/js/firebase-config.js</code> and paste the config from
-      Firebase Console &rarr; Project settings &rarr; Your apps &rarr; Web app. Then enable
-      <b>Authentication</b> (Google + Email/Password), <b>Firestore</b> and <b>Storage</b>.</p>
-      <ol class="small muted" style="padding-left:18px;line-height:1.9">
-        <li>Create a project at console.firebase.google.com</li>
-        <li>Add a Web app and copy the config block</li>
-        <li>Deploy with <code>firebase deploy</code> (see README)</li>
-      </ol>
-      <button class="btn btn--primary btn--block mt-16" id="cfgOk">Got it</button>
+      <div class="modal__body">
+        <p class="small muted">Open <code>assets/js/firebase-config.js</code> and paste the config from
+        Firebase Console &rarr; Project settings &rarr; Your apps &rarr; Web app. Then enable
+        <b>Authentication</b> (Google + Email/Password), <b>Firestore</b> and <b>Storage</b>.</p>
+        <ol class="small muted" style="padding-left:18px;line-height:1.9">
+          <li>Create a project at console.firebase.google.com</li>
+          <li>Add a Web app and copy the config block</li>
+          <li>Deploy with <code>firebase deploy</code> (see README)</li>
+        </ol>
+        <button class="btn btn--primary btn--block mt-16" id="cfgOk">Got it</button>
+      </div>
     </div>` });
   document.body.append(overlay);
   overlay.querySelector('#cfgClose').onclick = () => overlay.remove();
@@ -334,12 +432,10 @@ export function requireAuth(action = 'do that') {
   return false;
 }
 
-/** Identity used for writes: the signed-in uid, or a local guest in preview. */
 export function actorId() {
   return session.user?.uid || (isConfigured ? null : 'guest');
 }
 
-/** Display identity for new comments. */
 export function actorProfile() {
   if (session.user) {
     return { uid: session.user.uid, displayName: session.user.displayName, photoURL: session.user.photoURL, email: session.user.email };
@@ -351,5 +447,8 @@ export function money(amount) {
   const v = Number(amount) || 0;
   return `${siteConfig.currencySymbol}${v.toLocaleString('en-IN')}`;
 }
+
+/* Backwards-compatible alias — older pages called this renderHeader(). */
+export const renderHeader = renderShell;
 
 export { el, icon, escapeHtml, initials, toast, $, $$ };

@@ -32,7 +32,7 @@ service cloud.firestore {
     // Fields a client is allowed to bump on a book document.
     function counterOnly() {
       return request.resource.data.diff(resource.data).affectedKeys()
-        .hasOnly(['views', 'likes', 'ratingSum', 'ratingCount', 'ratingAvg']);
+        .hasOnly(['views', 'likes', 'ratingSum', 'ratingCount', 'ratingAvg', 'commentCount']);
     }
 
     // ---- books ------------------------------------------------------------

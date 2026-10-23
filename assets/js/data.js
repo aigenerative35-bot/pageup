@@ -2,7 +2,7 @@
    All reads/writes for books, likes, ratings and comments live here so the
    view code stays free of SDK details. */
 import {
-  collection, doc, getDoc, getDocs, setDoc, addDoc, deleteDoc, updateDoc,
+  collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc,
   query, where, orderBy, limit as fbLimit, startAfter, serverTimestamp,
   onSnapshot, increment, writeBatch, runTransaction,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
@@ -157,7 +157,9 @@ export function subscribeComments(bookId, cb) {
 export async function addComment(bookId, user, text) {
   const clean = String(text || '').trim().slice(0, 2000);
   if (!clean) throw new Error('Comment is empty');
-  return addDoc(collection(db, COLLECTIONS.books, bookId, COLLECTIONS.comments), {
+  const ref = doc(collection(db, COLLECTIONS.books, bookId, COLLECTIONS.comments));
+  const batch = writeBatch(db);
+  batch.set(ref, {
     uid: user.uid,
     name: user.displayName || user.email?.split('@')[0] || 'Reader',
     photoURL: user.photoURL || '',
@@ -165,10 +167,18 @@ export async function addComment(bookId, user, text) {
     likes: 0,
     createdAt: serverTimestamp(),
   });
+  // Keep the denormalised counter on the book in step, so the grid can show
+  // a comment count without reading every comment subcollection.
+  batch.update(bookDoc(bookId), { commentCount: increment(1) });
+  await batch.commit();
+  return ref.id;
 }
 
 export async function deleteComment(bookId, commentId) {
-  await deleteDoc(doc(db, COLLECTIONS.books, bookId, COLLECTIONS.comments, commentId));
+  const batch = writeBatch(db);
+  batch.delete(doc(db, COLLECTIONS.books, bookId, COLLECTIONS.comments, commentId));
+  batch.update(bookDoc(bookId), { commentCount: increment(-1) });
+  await batch.commit();
 }
 
 export async function toggleCommentLike(bookId, commentId, uid) {
