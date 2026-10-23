@@ -43,7 +43,7 @@ banner_js = strip_module_syntax(read(os.path.join(SRC, "assets/js/banner.js")))
 app_js = read(os.path.join(WORK, "preview-app.js"))
 
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>"
-           "<rect width='24' height='24' rx='6' fill='%23e42527'/>"
+           "<rect width='24' height='24' rx='6' fill='%23226db4'/>"
            "<path d='M7 17.5A1.5 1.5 0 0 1 8.5 16H17V6H8.5A1.5 1.5 0 0 0 7 7.5z' fill='white'/></svg>")
 
 HTML = f"""<!DOCTYPE html>
@@ -53,7 +53,7 @@ HTML = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PageUp &mdash; Interactive preview</title>
 <meta name="description" content="PageUp freemium reading platform &mdash; self-contained interactive preview. Browse the grid, open a book, read the sample, hit the paywall.">
-<meta name="theme-color" content="#e42527">
+<meta name="theme-color" content="#226db4">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
